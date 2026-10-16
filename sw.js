@@ -1,6 +1,6 @@
 /* Service worker: makes the app work offline. Bump V when you change the file list. */
-const V = "cms-v2", F = "cms-fonts";
-const CORE = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png"];
+const V = "cms-v3", F = "cms-fonts";
+const CORE = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(V).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
 });
