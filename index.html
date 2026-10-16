@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="km">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7B3FE4">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="កាតសិស្ស">
+<meta name="description" content="គ្រប់គ្រងបញ្ជីសិស្ស និងបង្កើតកាតសិស្សសម្រាប់បោះពុម្ព">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>ប្រព័ន្ធគ្រប់គ្រងកាតសិស្ស</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Battambang&family=Bokor&family=Content&family=Dangrek&family=Fasthand&family=Freehand&family=Hanuman&family=Koulen&family=Metal&family=Moul&family=Moulpali&family=Nokora&family=Siemreap&family=Suwannaphum&display=swap">
+<style>
+html{color-scheme:light;padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+/* Layout: Canva-style studio. Left rail nav + soft rounded workspace; mobile = bottom tab bar.
+   Palette: violet (brand), teal (action accent), gold (Khmer card border). Display: Muol Light. Body: Siemreap. */
+:root{
+  --bg:#F3F1FB; --surface:#FFFFFF; --surface2:#F8F7FD; --line:#E4E0F4; --fg:#1E1B2E; --muted:#6B6785;
+  --brand:#7B3FE4; --brand-ink:#FFFFFF; --brand-soft:#EFE7FD;
+  --teal:#00A6B2; --teal-soft:#DDF6F7;
+  --gold:#C9971C; --good:#14946B; --warn:#C77700; --bad:#D6334A; --bad-soft:#FDE8EB;
+  --shadow:0 1px 2px rgba(40,24,90,.06),0 8px 24px rgba(40,24,90,.08);
+  --f-display:"Khmer OS Muol Light","Moul",serif;
+  --f-body:"Khmer OS Siemreap","Siemreap",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12101B; --surface:#1B1827; --surface2:#221F31; --line:#332E49; --fg:#F1EEFB; --muted:#A39EBE;
+  --brand:#A27BFF; --brand-ink:#16102A; --brand-soft:#2C2250; --teal:#38D3DE; --teal-soft:#123A40;
+  --gold:#E2B648; --good:#3FD1A1; --warn:#F0A63A; --bad:#FF7285; --bad-soft:#3F1B24;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12101B; --surface:#1B1827; --surface2:#221F31; --line:#332E49; --fg:#F1EEFB; --muted:#A39EBE;
+  --brand:#A27BFF; --brand-ink:#16102A; --brand-soft:#2C2250; --teal:#38D3DE; --teal-soft:#123A40;
+  --gold:#E2B648; --good:#3FD1A1; --warn:#F0A63A; --bad:#FF7285; --bad-soft:#3F1B24;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.7;
+  padding-block:0;padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px));min-height:100%}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;line-height:1.6;margin:0;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.sr{position:absolute;left:-9999px}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);
+  padding:9px 16px;border-radius:12px;font-weight:400;min-height:42px;transition:transform .12s,box-shadow .12s,background .12s}
+.btn:hover{background:var(--surface2)}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:linear-gradient(135deg,var(--brand),#5B2FD0);color:#fff;border-color:transparent;box-shadow:0 6px 16px rgba(123,63,228,.3)}
+:root[data-theme="dark"] .btn.primary{color:#16102A;background:var(--brand)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#16102A;background:var(--brand)}}
+.btn.teal{background:var(--teal);color:#fff;border-color:transparent}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.danger.sure{background:var(--bad);color:#fff}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.sm{min-height:34px;padding:4px 12px;font-size:13px;border-radius:10px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+/* inputs */
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field>label{font-size:13px;color:var(--muted)}
+.in,select.in,textarea.in{width:100%;padding:10px 14px;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;min-height:44px}
+.in:focus{border-color:var(--brand);outline:none;box-shadow:0 0 0 4px var(--brand-soft)}
+
+/* login */
+.login{min-height:100vh;min-height:100dvh;display:grid;grid-template-columns:1.1fr 1fr}
+.login-art{background:linear-gradient(150deg,#6A2FD6 0%,#8B4DF0 45%,#00B3BE 120%);color:#fff;padding:48px max(32px,env(safe-area-inset-left,0px));
+  display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.login-art h1{font-size:30px;max-width:14em}
+.login-art p{max-width:30em;opacity:.92}
+.blob{position:absolute;border-radius:50%;filter:blur(2px);opacity:.25;background:#fff}
+.login-art .mini{display:flex;gap:12px;flex-wrap:wrap;position:relative;z-index:1}
+.mini .mc{width:96px;height:132px;border-radius:12px;background:#F2F5FF;border:3px double #C9971C;box-shadow:0 12px 30px rgba(0,0,0,.25);transform:rotate(-6deg);display:flex;flex-direction:column;gap:6px;padding:10px}
+.mini .mc:nth-child(2){transform:rotate(3deg) translateY(10px)}
+.mini .mc:nth-child(3){transform:rotate(-2deg) translateY(-6px)}
+.mc i{display:block;height:6px;border-radius:3px;background:#C9D3EE}
+.mc b{display:block;width:34px;height:42px;border:2px solid #E4B73A;border-radius:4px;margin-top:auto;background:#fff}
+.login-form{display:flex;align-items:center;justify-content:center;padding:32px max(20px,env(safe-area-inset-right,0px))}
+.login-card{width:100%;max-width:380px;display:flex;flex-direction:column;gap:16px}
+.login-card h2{font-size:20px}
+.hint{font-size:13px;color:var(--muted)}
+.err{color:var(--bad);font-size:13px;min-height:20px}
+
+/* shell */
+.shell{display:grid;grid-template-columns:248px 1fr;min-height:100vh;min-height:100dvh}
+.rail{background:var(--surface);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh;height:100dvh}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px}
+.brand .lg{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--teal));display:grid;place-items:center;color:#fff}
+.brand b{font-family:var(--f-display);font-weight:400;font-size:13px;line-height:1.5}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav button{display:flex;align-items:center;gap:12px;padding:11px 14px;border:0;background:transparent;border-radius:12px;text-align:left;color:var(--muted)}
+.nav button:hover{background:var(--surface2);color:var(--fg)}
+.nav button[aria-current="page"]{background:var(--brand-soft);color:var(--brand)}
+.rail-foot{margin-top:auto;display:flex;flex-direction:column;gap:6px}
+.main{padding:28px clamp(16px,3vw,40px);min-width:0;padding-left:max(16px,calc(clamp(16px,3vw,40px)));}
+.page-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-bottom:22px}
+.page-head h1{font-size:22px}
+.page-head p{margin:2px 0 0;color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* surfaces */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:20px;min-width:0}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g2{grid-template-columns:1.3fr 1fr}
+.stat{display:flex;gap:14px;align-items:center;padding:18px;border-radius:20px;color:#fff;min-width:0}
+.stat .ic{width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.22);display:grid;place-items:center}
+.stat small{display:block;opacity:.92;font-size:13px}
+.stat strong{font-size:28px;line-height:1.2;font-variant-numeric:tabular-nums}
+.s1{background:linear-gradient(135deg,#7B3FE4,#9D6BFF)}
+.s2{background:linear-gradient(135deg,#0097A7,#2CD3D9)}
+.s3{background:linear-gradient(135deg,#E0457B,#FF8FB0)}
+.s4{background:linear-gradient(135deg,#C9971C,#F3CB5B)}
+.bar{display:grid;grid-template-columns:64px 1fr 36px;gap:10px;align-items:center;font-size:14px}
+.bar .t{height:12px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--brand),var(--teal))}
+.bar span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.ava{width:40px;height:50px;border-radius:8px;object-fit:cover;background:var(--brand-soft);display:grid;place-items:center;color:var(--brand);flex:none;overflow:hidden}
+.li{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.li:last-child{border:0}
+.li div{min-width:0}
+.li small{color:var(--muted);display:block}
+.pill{display:inline-block;padding:1px 10px;border-radius:99px;font-size:12.5px;background:var(--brand-soft);color:var(--brand)}
+.pill.f{background:#FDE7F0;color:#C02662}.pill.m{background:var(--teal-soft);color:#007985}
+:root[data-theme="dark"] .pill.f{background:#43192E;color:#FF9DC2}
+:root[data-theme="dark"] .pill.m{color:#6BE3EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill.f{background:#43192E;color:#FF9DC2}:root:not([data-theme="light"]) .pill.m{color:#6BE3EC}}
+.banner{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--teal-soft);border-radius:16px;padding:12px 16px;margin-bottom:18px}
+
+/* table */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:16px}
+table{border-collapse:collapse;width:100%;min-width:760px;background:var(--surface)}
+th{font-family:var(--f-display);font-weight:400;font-size:12.5px;background:var(--surface2);text-align:left;padding:12px 14px;white-space:nowrap}
+td{padding:10px 14px;border-top:1px solid var(--line);vertical-align:middle}
+tbody tr:hover{background:var(--surface2)}
+td.act{white-space:nowrap;text-align:right}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;color:var(--muted)}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(18,12,40,.5);display:flex;align-items:flex-start;justify-content:center;overflow:auto;z-index:50;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.modal{background:var(--surface);border-radius:24px;width:100%;max-width:640px;box-shadow:0 30px 80px rgba(0,0,0,.35);padding:24px;margin-block:auto}
+.modal h2{font-size:18px;margin-bottom:16px}
+.form{display:grid;grid-template-columns:150px 1fr 1fr;gap:14px}
+.form .ph{grid-row:span 4}
+.form .w2{grid-column:span 2}
+.photo{aspect-ratio:4/5;border:2px dashed var(--line);border-radius:16px;display:grid;place-items:center;text-align:center;color:var(--muted);overflow:hidden;background:var(--surface2);width:100%}
+.photo img{width:100%;height:100%;object-fit:cover}
+.modal-foot{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
+
+/* cards workspace */
+.cw{display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start}
+.pick{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:14px}
+.pick label{display:flex;gap:10px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.pick label:last-child{border:0}
+.seg{display:grid;gap:8px}
+.seg label{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;cursor:pointer}
+.seg label:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
+.stage{background:repeating-conic-gradient(var(--surface2) 0 25%,var(--bg) 0 50%) 0 0/20px 20px;border-radius:20px;padding:20px;overflow:auto;border:1px solid var(--line)}
+.sheet{display:grid;grid-template-columns:repeat(2,90mm);gap:4mm;justify-content:center;zoom:.82}
+
+/* ID card (fixed print palette, independent of theme) */
+.card{-webkit-print-color-adjust:exact;print-color-adjust:exact;--c-bg:#F1F5FD;--c-ink:#1B2A5E;--c-text:#111;--c-gold:#C79A1B;--c-red:#C8102E;
+  width:90mm;height:127mm;background:var(--c-bg);color:var(--c-text);border:1.1mm solid var(--c-gold);border-radius:2mm;position:relative;
+  padding:3mm 4mm;display:flex;flex-direction:column;overflow:hidden;font-family:var(--f-body);break-inside:avoid;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.card::before,.card::after{content:"";position:absolute;width:9mm;height:9mm;border:0.6mm solid var(--c-gold);pointer-events:none}
+.card::before{left:1mm;top:1mm;border-right:0;border-bottom:0;border-radius:3mm 0 0 0}
+.card::after{right:1mm;bottom:1mm;border-left:0;border-top:0;border-radius:0 0 3mm 0}
+.wm{position:absolute;inset:34mm 10mm 30mm;display:grid;place-items:center;opacity:.09;pointer-events:none}
+.wm img{max-width:100%;max-height:100%}
+.c-top{text-align:center}
+.c-king{font-family:var(--f-display);font-size:3.9mm;color:var(--c-ink);line-height:1.7}
+.c-nation{font-family:var(--f-display);font-size:3.3mm;color:var(--c-ink);line-height:1.7}
+.c-rule{height:.35mm;background:linear-gradient(90deg,transparent,var(--c-red),transparent);margin:.8mm 8mm}
+.c-orgt{flex:1;text-align:center;font-size:3mm;color:var(--c-ink);line-height:1.6}
+.c-title{font-family:var(--f-display);font-size:4.8mm;text-align:center;color:var(--c-ink);margin:1.4mm 0 1mm;border-top:.5mm solid var(--c-gold);padding-top:1.2mm}
+.c-body{display:flex;flex-direction:column;gap:.2mm;position:relative}
+.c-row{display:flex;justify-content:space-between;gap:2mm;font-size:3.2mm;line-height:1.7;white-space:nowrap}
+.c-row span{overflow:hidden;text-overflow:ellipsis}
+.c-row .grow{flex:1}
+
+
+.c-org{margin-top:1.5mm;padding-left:17mm;min-height:15mm;display:flex;align-items:center;justify-content:center}
+.c-top,.c-title,.c-body{position:relative;z-index:1}
+.bgimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;z-index:0;-webkit-user-drag:none}
+.el{position:absolute;box-sizing:border-box;z-index:2}
+.el img{-webkit-user-drag:none;user-select:none}
+.el.logo{display:grid;place-items:center;font-size:2.2mm;color:#8A95B5;text-align:center}
+.el.logo.ph{border:.4mm dashed #9AA6C8;border-radius:50%}
+.el.logo img{width:100%;height:100%;object-fit:contain}
+.el.photo{border:.8mm solid #F2B705;background:#fff;display:grid;place-items:center;overflow:hidden;color:#A9B3CC;font-size:2.4mm}
+.el.photo img{width:100%;height:100%;object-fit:cover}
+.el.school{text-align:center}
+.el.school .sch{font-family:var(--f-display);font-size:calc(2.9mm*var(--k,1));color:var(--c-red);line-height:1.65}
+.el.school .yr{font-size:calc(3.1mm*var(--k,1));color:var(--c-ink);line-height:1.65}
+.el.sign{text-align:center;font-size:calc(2.6mm*var(--k,1));line-height:1.65}
+.el.sign .sg{font-family:var(--f-display);margin-top:1.5mm}
+.el.stamp img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+.el.stamp.ph{border:.4mm dashed #E0457B;color:#E0457B;display:grid;place-items:center;font-size:3mm}
+.rz{display:none;position:absolute;right:0;bottom:0;width:3.4mm;height:3.4mm;background:#E0457B;border-radius:50%;cursor:nwse-resize;z-index:5}
+.edm .el{cursor:move;outline:.35mm dashed #00A6B2;touch-action:none}
+.edm .el.on{outline:.5mm solid #E0457B}
+.edm .el.on .rz{display:block}
+.sheet.big{zoom:1.35}
+.ed-note{font-size:13px;color:var(--muted)}
+
+.el.head{text-align:center}
+.el .c-king{font-size:calc(3.9mm*var(--k,1));line-height:1.7}
+.el .c-nation{font-size:calc(3.3mm*var(--k,1));line-height:1.7}
+.el.dept{text-align:center;font-size:calc(3mm*var(--k,1));color:var(--c-ink);line-height:1.6}
+.el.title{font-family:var(--f-display);font-size:calc(4.8mm*var(--k,1));text-align:center;color:var(--c-ink);border-top:.5mm solid var(--c-gold);padding-top:1mm;line-height:1.6}
+.el.txt{font-size:calc(3.2mm*var(--k,1));line-height:1.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.swatch{width:48px;height:40px;padding:0;border:1.5px solid var(--line);border-radius:10px;background:none;cursor:pointer}
+.dot{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line);cursor:pointer;padding:0}
+.bgth{width:44px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.card.nob{border-color:transparent}
+.card.nob::before,.card.nob::after{display:none}
+.el.frame{z-index:1;pointer-events:none}
+.edm .el.frame{pointer-events:auto}
+.el.frame img{width:100%;height:100%;object-fit:fill;display:block;pointer-events:none}
+.ffs,.ffs *{font-family:inherit!important}
+.fcs,.fcs *{color:inherit!important}
+.fws,.fws *{font-weight:700!important}
+/* misc */
+.toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:99px;z-index:90;box-shadow:var(--shadow)}
+.tabs{display:none}
+.sect{display:grid;gap:14px;margin-bottom:20px}
+.sect h2{font-size:15px}
+
+@media (max-width:980px){
+  .g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g2{grid-template-columns:1fr}.cw{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .login{grid-template-columns:1fr}.login-art{padding-block:28px}.login-art .mini{display:none}
+  .shell{grid-template-columns:1fr}
+  .rail{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;flex-direction:row;padding:6px max(8px,env(safe-area-inset-right,0px)) max(6px,env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));border-right:0;border-top:1px solid var(--line);z-index:40}
+  .brand,.rail-foot .txt{display:none}
+  .nav{flex-direction:row;flex:1;justify-content:space-around}
+  .nav button{flex-direction:column;gap:2px;font-size:11.5px;padding:6px 8px;line-height:1.4}
+  .rail-foot{margin:0;flex-direction:row}
+  .main{padding-bottom:96px}
+  .form{grid-template-columns:1fr 1fr}.form .ph{grid-row:auto;grid-column:span 2;max-width:150px}
+  .sheet{zoom:.6}
+}
+@media (max-width:420px){.g4{grid-template-columns:1fr}.form{grid-template-columns:1fr}.form .w2,.form .ph{grid-column:auto}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* phone: student rows become cards, one id card per row */
+@media (max-width:760px){
+  .tw{border:0;overflow:visible;background:none}
+  table{min-width:0;background:none}
+  thead{display:none}
+  tbody{display:grid;gap:10px}
+  tbody tr{display:grid;grid-template-columns:auto auto auto 1fr auto;grid-template-areas:"ph name name name act" "ph no cls sex act" "ph dob dob dob act";gap:2px 10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 12px}
+  tbody tr:hover{background:var(--surface)}
+  td{border:0;padding:0}
+  td.c-ph{grid-area:ph}td.c-name{grid-area:name;font-weight:700}td.c-no{grid-area:no;color:var(--muted)}
+  td.c-cls{grid-area:cls}td.c-sex{grid-area:sex}td.c-dob{grid-area:dob;color:var(--muted);font-size:13px}td.c-par{display:none}td.act{grid-area:act}
+  .sheet{grid-template-columns:90mm;zoom:.85}.sheet.big{zoom:.8}.stage{padding:12px}
+  .modal{padding:18px;border-radius:20px}
+}
+/* print: only the card sheet */
+@media print{
+  @page{size:A4;margin:8mm}
+  body{background:#fff}
+  .rail,.page-head,.cw>aside,.banner,.toast,.pager,.noprint{display:none!important}
+  .shell,.cw{display:block}.main{padding:0}
+  .stage{border:0;background:none;padding:0;overflow:visible}
+  .sheet{zoom:1!important;grid-template-columns:repeat(2,90mm)!important}.card{box-shadow:none}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="layer"></div>
+
+<script>
+"use strict";
+/* ---------- storage ---------- */
+const mem={};
+const LS={
+  get(k,d){try{const v=localStorage.getItem(k);return v==null?(k in mem?mem[k]:d):JSON.parse(v)}catch(e){return k in mem?mem[k]:d}},
+  set(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
+};
+/* true when the page is a normal top-level page (not inside a sandboxed preview): printing and file downloads work */
+const LOCAL=(()=>{try{return window.top===window}catch(e){return false}})();
+const DB={
+  _p:null,
+  open(){if(!this._p)this._p=new Promise((res,rej)=>{try{const r=indexedDB.open("cms",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);r.onblocked=()=>rej(new Error("blocked"))}catch(e){rej(e)}});return this._p},
+  async get(k){const d=await this.open();return new Promise((res,rej)=>{const q=d.transaction("kv").objectStore("kv").get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})},
+  async set(k,v){const d=await this.open();return new Promise((res,rej)=>{const t=d.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=()=>res(true);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error)})}
+};
+const KH="០១២៣៤៥៦៧៨៩";
+const kh=n=>String(n).replace(/\d/g,d=>KH[d]);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const $=(s,r=document)=>r.querySelector(s);
+const uid=()=>Math.random().toString(36).slice(2,9);
+
+/* ---------- defaults ---------- */
+const DEF={user:"admin",pass:"1234",kingdom:"ព្រះរាជាណាចក្រកម្ពុជា",nation:"ជាតិ សាសនា ព្រះមហាក្សត្រ",
+  dept:"មន្ទីរអប់រំ យុវជន និងកីឡា",province:"ខេត្តបន្ទាយមានជ័យ",title:"បណ្ណសម្គាល់ខ្លួនសិស្ស",
+  school:"អនុវិទ្យាល័យហ៊ុនសែនតាបែន",year:"២០២៦-២០២៧",date1:"ថ្ងៃសុក្រ ១១រោច ខែអស្សុជ ឆ្នាំមមី អដ្ឋស័ក ព.ស. ២៥៧០",
+  date2:"តាបែន ថ្ងៃទី១៦ ខែតុលា ឆ្នាំ២០២៦",signer:"នាយកសាលា",logo:"",stamp:"",bg:"",bgc:"#F1F5FD",bgop:40,bgfit:"cover",frame:"",hideBorder:false};
+const DEFLAY={head:{x:4,y:3,w:82,h:14,fs:100},dept:{x:22,y:18,w:64,h:12,fs:100},logo:{x:4,y:17,w:15,h:15},title:{x:4,y:33,w:82,h:9,fs:100},
+ r_class:{x:4,y:44,w:40,h:5.5,fs:100},r_id:{x:46,y:44,w:40,h:5.5,fs:100},r_name:{x:4,y:49.5,w:58,h:5.5,fs:100},r_sex:{x:64,y:49.5,w:22,h:5.5,fs:100},
+ r_dob:{x:4,y:55,w:82,h:5.5,fs:100},r_addr:{x:4,y:60.5,w:82,h:5.5,fs:100},r_father:{x:4,y:66,w:82,h:5.5,fs:100},r_mother:{x:4,y:71.5,w:82,h:5.5,fs:100},
+ photo:{x:4,y:91,w:25,h:31},school:{x:32,y:91,w:54,h:14,fs:100},sign:{x:32,y:105,w:54,h:19,fs:100},stamp:{x:50,y:97,w:28,h:28},frame:{x:0,y:0,w:87.8,h:124.8}};
+const SAMPLE={no:"000",name:"គោត្តនាម នាម",sex:"ប្រុស",dob:"១២/មករា/២០១២",addr:"ភូមិ…",cls:'៧"A"',father:"…",mother:"…",photo:""};
+const DEMO=[
+ ["124","សាហ៊ាវ កក្កដា","ស្រី","១១/សីហា/២០១៥","ស្វាយចេក",'៨"B"',"ចាន បុផ្ផា","ស ស"],
+ ["112","សិន កក្កដ","ស្រី","១១/សីហា/២០១១","អូរជ្រៃ",'៩"A"',"ដដ","ថថ"],
+ ["155","ចចក កាច","ប្រុស","១២/តុលា/២០១០","តាបែន",'៧"C"',"កាច សាហ៊ាវ","ស្លូតណាស់"],
+ ["1234","ដដថ","ប្រុស","១១/១២/២០១២","តាបែន",'៧"A"',"ចចច","ឆឆ"]
+].map(r=>({id:uid(),no:r[0],name:r[1],sex:r[2],dob:r[3],addr:r[4],cls:r[5],father:r[6],mother:r[7],photo:"",demo:true}));
+const CLASSES=[];for(let g=7;g<=12;g++)for(const s of "ABCDE")CLASSES.push(kh(g)+'"'+s+'"');
+
+const S={
+  students:LS.get("cms.students",null)||DEMO,
+  cfg:Object.assign({},DEF,LS.get("cms.cfg",{})),
+  authed:false,view:"dashboard",q:"",fc:"",fs:"",page:1,
+  scope:"all",scls:"",sel:new Set(),built:true,edit:false,selEl:"photo"
+};
+const initLay=()=>{S.cfg.lay=Object.fromEntries(Object.keys(DEFLAY).map(k=>[k,Object.assign({},DEFLAY[k],(S.cfg.lay||{})[k])]))};
+initLay();
+try{S.authed=sessionStorage.getItem("cms.auth")==="1"}catch(e){}
+try{const h=location.hash.slice(1);if(["dashboard","students","cards","settings"].includes(h))S.view=h}catch(e){}
+let warned=false;
+const persist=(k,v,ls)=>DB.set(k,v).catch(()=>{if(!LS.set(ls,v)&&!warned){warned=true;toast("ទំហំផ្ទុកពេញ ឬមិនអាចរក្សាទុកបាន។ សូមបម្រុងទុកទិន្នន័យ")}});
+const saveStudents=()=>persist("students",S.students,"cms.students");
+const saveCfg=()=>persist("cfg",S.cfg,"cms.cfg");
+
+/* ---------- icons ---------- */
+const P={
+ home:'<path d="M3 11l9-8 9 8M5 10v10h14V10"/>',users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5M16 4.8a3.4 3.4 0 010 6.4M18 14.8c2 .6 3.3 2.3 3.6 5.2"/>',
+ card:'<rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2"/><path d="M6.5 16c.5-1.6 1.5-2.2 2.5-2.2s2 .6 2.5 2.2M14 10h4M14 13.5h3"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+ edit:'<path d="M4 20h4L19 9a2.8 2.8 0 00-4-4L4 16z"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+ up:'<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>',down:'<path d="M12 4v12M7 11l5 5 5-5M4 20h16"/>',
+ print:'<path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+ moon:'<path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/>',out:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 4-6 8-6s7.2 2 8 6"/>',
+ copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/>',
+ gen:'<path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>'
+};
+const ic=n=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${P[n]||""}</svg>`;
+
+/* ---------- helpers ---------- */
+let tt;function toast(m){let t=$(".toast");if(t)t.remove();t=document.createElement("div");t.className="toast";t.setAttribute("role","status");t.textContent=m;document.body.appendChild(t);clearTimeout(tt);tt=setTimeout(()=>t.remove(),2800)}
+function setTheme(t){document.documentElement.setAttribute("data-theme",t);LS.set("cms.theme",t)}
+const th=LS.get("cms.theme",null);if(th)document.documentElement.setAttribute("data-theme",th);
+const isDark=()=>{const a=document.documentElement.getAttribute("data-theme");return a?a==="dark":matchMedia("(prefers-color-scheme: dark)").matches};
+const norm=s=>String(s||"").toLowerCase();
+function filtered(){
+  const q=norm(S.q);
+  return S.students.filter(s=>(!S.fc||s.cls===S.fc)&&(!S.fs||s.sex===S.fs)&&(!q||[s.no,s.name,s.cls,s.addr,s.father,s.mother].some(v=>norm(v).includes(q))));
+}
+const classesUsed=()=>[...new Set(S.students.map(s=>s.cls).filter(Boolean))].sort();
+const thumb=s=>s.photo?`<img class="ava" src="${s.photo}" alt="">`:`<span class="ava">${ic("user")}</span>`;
+
+/* ---------- login ---------- */
+function loginView(){return `
+<div class="login">
+  <section class="login-art">
+    <div class="blob" style="width:260px;height:260px;right:-60px;top:-60px"></div>
+    <div class="blob" style="width:160px;height:160px;left:30%;bottom:-50px"></div>
+    <div style="position:relative;z-index:1">
+      <h1>ប្រព័ន្ធគ្រប់គ្រងកាតសិស្ស</h1>
+      <p>គ្រប់គ្រងបញ្ជីសិស្ស បញ្ចូលរូបថត និងបង្កើតកាតសិស្សដើម្បីបោះពុម្ព បានយ៉ាងឆាប់រហ័ស។</p>
+    </div>
+    <div class="mini" aria-hidden="true">
+      <div class="mc"><i style="width:70%"></i><i></i><i style="width:80%"></i><i style="width:60%"></i><b></b></div>
+      <div class="mc"><i style="width:70%"></i><i></i><i style="width:80%"></i><i style="width:60%"></i><b></b></div>
+      <div class="mc"><i style="width:70%"></i><i></i><i style="width:80%"></i><i style="width:60%"></i><b></b></div>
+    </div>
+  </section>
+  <section class="login-form">
+    <form class="login-card" id="lf" autocomplete="off">
+      <h2>សូមស្វាគមន៍</h2>
+      <div class="field"><label for="lu">អ្នកប្រើ</label><input class="in" id="lu" value="" placeholder="admin"></div>
+      <div class="field"><label for="lp">ពាក្យសម្ងាត់</label><input class="in" id="lp" type="password" placeholder="••••"></div>
+      <div class="err" id="le" role="alert"></div>
+      <button class="btn primary" type="submit">ចូលប្រើ</button>
+      <div class="hint">លំនាំដើម៖ admin / 1234 (ប្តូរបានក្នុងការកំណត់)</div>
+    </form>
+  </section>
+</div>`}
+
+/* ---------- shell ---------- */
+const NAV=[["dashboard","home","ផ្ទាំងគ្រប់គ្រង"],["students","users","បញ្ជីសិស្ស"],["cards","card","បង្កើតកាត"],["settings","gear","ការកំណត់"]];
+function shell(){return `
+<div class="shell">
+  <nav class="rail" aria-label="ម៉ឺនុយ">
+    <div class="brand"><span class="lg">${ic("card")}</span><b>កាតសិស្ស</b></div>
+    <div class="nav">${NAV.map(n=>`<button data-act="nav" data-v="${n[0]}" ${S.view===n[0]?'aria-current="page"':""}>${ic(n[1])}<span>${n[2]}</span></button>`).join("")}</div>
+    <div class="rail-foot">
+      <button class="btn ghost" data-act="theme" aria-label="ប្តូរពណ៌ផ្ទាំង">${ic(isDark()?"sun":"moon")}<span class="txt">${isDark()?"ផ្ទាំងភ្លឺ":"ផ្ទាំងងងឹត"}</span></button>
+      <button class="btn ghost" data-act="logout" aria-label="ចាកចេញ">${ic("out")}<span class="txt">ចាកចេញ</span></button>
+    </div>
+  </nav>
+  <main class="main" id="main"></main>
+</div>`}
+
+function demoBanner(){
+  if(!S.students.some(s=>s.demo))return"";
+  return `<div class="banner"><span>ទិន្នន័យនេះជាឧទាហរណ៍។ សូមលុបចោល មុនបញ្ចូលសិស្សពិត។</span><button class="btn sm teal" data-act="clrdemo">លុបទិន្នន័យឧទាហរណ៍</button></div>`;
+}
+
+/* ---------- dashboard ---------- */
+function dashboard(){
+  const n=S.students.length,m=S.students.filter(s=>s.sex==="ប្រុស").length,f=S.students.filter(s=>s.sex==="ស្រី").length;
+  const cl={};S.students.forEach(s=>{if(s.cls)cl[s.cls]=(cl[s.cls]||0)+1});
+  const ents=Object.entries(cl).sort((a,b)=>a[0].localeCompare(b[0],"km"));const mx=Math.max(1,...ents.map(e=>e[1]));
+  const withPhoto=S.students.filter(s=>s.photo).length;
+  const recent=S.students.slice(-5).reverse();
+  return `
+  <div class="page-head"><div><h1>ផ្ទាំងគ្រប់គ្រង</h1><p>${esc(S.cfg.school)} · ឆ្នាំសិក្សា ${esc(S.cfg.year)}</p></div>
+    <div class="row"><button class="btn" data-act="nav" data-v="cards">${ic("card")}បង្កើតកាត</button><button class="btn primary" data-act="add">${ic("plus")}បន្ថែមសិស្ស</button></div></div>
+  ${demoBanner()}
+  <div class="grid g4" style="margin-bottom:16px">
+    <div class="stat s1"><span class="ic">${ic("users")}</span><div><small>សិស្សសរុប</small><strong>${kh(n)}</strong></div></div>
+    <div class="stat s2"><span class="ic">${ic("user")}</span><div><small>ប្រុស</small><strong>${kh(m)}</strong></div></div>
+    <div class="stat s3"><span class="ic">${ic("user")}</span><div><small>ស្រី</small><strong>${kh(f)}</strong></div></div>
+    <div class="stat s4"><span class="ic">${ic("card")}</span><div><small>មានរូបថត</small><strong>${kh(withPhoto)}<span style="font-size:15px;opacity:.9"> / ${kh(n)}</span></strong></div></div>
+  </div>
+  <div class="grid g2">
+    <section class="panel"><h2 style="font-size:15px;margin-bottom:14px">ចំនួនសិស្សតាមថ្នាក់</h2>
+      <div class="grid" style="gap:10px">${ents.length?ents.map(([k,v])=>`<div class="bar"><span>${esc(k)}</span><span class="t"><i style="width:${v/mx*100}%"></i></span><span>${kh(v)}</span></div>`).join(""):'<div class="empty">មិនទាន់មានទិន្នន័យ</div>'}</div></section>
+    <section class="panel"><h2 style="font-size:15px;margin-bottom:8px">សិស្សបន្ថែមថ្មីៗ</h2>
+      ${recent.length?recent.map(s=>`<div class="li">${thumb(s)}<div><b style="font-weight:400">${esc(s.name)}</b><small>${esc(s.no)} · ថ្នាក់ ${esc(s.cls)}</small></div></div>`).join(""):'<div class="empty">មិនទាន់មានសិស្ស</div>'}
+    </section>
+  </div>`;
+}
+
+/* ---------- students ---------- */
+function studentsView(){return `
+  <div class="page-head"><div><h1>បញ្ជីសិស្ស</h1><p>ស្វែងរក កែប្រែ និងលុបព័ត៌មានសិស្ស</p></div>
+    <div class="row"><label class="btn" for="xl" style="cursor:pointer">${ic("up")}នាំចូលពី Excel</label><input type="file" id="xl" accept=".xlsx,.xls,.csv" class="sr">
+      <label class="btn" for="phs" style="cursor:pointer">${ic("up")}រូបថតច្រើន</label><input type="file" id="phs" accept="image/*" multiple class="sr">
+      ${LOCAL?`<button class="btn" data-act="xltpl">${ic("down")}គំរូ Excel</button>`:""}
+      <button class="btn primary" data-act="add">${ic("plus")}បន្ថែមសិស្ស</button></div></div>
+  ${demoBanner()}
+  <div class="hint" style="margin-bottom:10px">Excel៖ ជួរឈរអាចមាន ទីតាំងដាក់រូបថត, អត្តលេខ, គោត្តនាម-នាម, ភេទ, ថ្ងៃខែឆ្នាំកំណើត, ទីលំនៅបច្ចុប្បន្ន, ថ្នាក់ទី, ឪពុកឈ្មោះ, ម្តាយឈ្មោះ។ "រូបថតច្រើន"៖ ដាក់ឈ្មោះឯកសាររូប = អត្តលេខ (ឧ. 124.jpg)។</div>
+  <div class="row" style="margin-bottom:14px">
+    <div class="field" style="flex:1;min-width:200px"><label class="sr" for="q">ស្វែងរក</label><input class="in" id="q" data-in="q" placeholder="ស្វែងរកតាមឈ្មោះ អត្តលេខ ថ្នាក់…" value="${esc(S.q)}"></div>
+    <select class="in" id="fc" data-in="fc" style="width:auto" aria-label="ថ្នាក់"><option value="">គ្រប់ថ្នាក់</option>${classesUsed().map(c=>`<option ${S.fc===c?"selected":""}>${esc(c)}</option>`).join("")}</select>
+    <select class="in" id="fs" data-in="fs" style="width:auto" aria-label="ភេទ"><option value="">គ្រប់ភេទ</option><option ${S.fs==="ប្រុស"?"selected":""}>ប្រុស</option><option ${S.fs==="ស្រី"?"selected":""}>ស្រី</option></select>
+  </div>
+  <div id="list"></div>`}
+const PER=20;
+function drawList(){
+  const el=$("#list");if(!el)return;
+  const a=filtered(),pages=Math.max(1,Math.ceil(a.length/PER));if(S.page>pages)S.page=pages;
+  const rows=a.slice((S.page-1)*PER,S.page*PER);
+  el.innerHTML=a.length?`
+  <div class="tw"><table><thead><tr><th>រូប</th><th>អត្តលេខ</th><th>គោត្តនាម-នាម</th><th>ភេទ</th><th>ថ្នាក់ទី</th><th>ថ្ងៃខែឆ្នាំកំណើត</th><th>ឪពុក / ម្តាយ</th><th></th></tr></thead><tbody>
+  ${rows.map(s=>`<tr><td class="c-ph">${thumb(s)}</td><td class="c-no">${esc(s.no)}</td><td class="c-name">${esc(s.name)}</td>
+    <td class="c-sex"><span class="pill ${s.sex==="ស្រី"?"f":"m"}">${esc(s.sex)}</span></td><td class="c-cls">${esc(s.cls)}</td><td class="c-dob">${esc(s.dob)}</td>
+    <td class="c-par">${esc(s.father)}<small style="color:var(--muted);display:block">${esc(s.mother)}</small></td>
+    <td class="act"><button class="btn sm" data-act="edit" data-id="${s.id}" aria-label="កែប្រែ ${esc(s.name)}">${ic("edit")}កែ</button></td></tr>`).join("")}
+  </tbody></table></div>
+  <div class="pager"><span>សិស្ស ${kh(a.length)} នាក់ · ទំព័រ ${kh(S.page)}/${kh(pages)}</span>
+    <span class="row"><button class="btn sm" data-act="pg" data-d="-1" ${S.page<=1?"disabled":""}>មុន</button><button class="btn sm" data-act="pg" data-d="1" ${S.page>=pages?"disabled":""}>បន្ទាប់</button></span></div>`
+  :`<div class="panel empty">រកមិនឃើញសិស្ស។ ចុច "បន្ថែមសិស្ស" ដើម្បីចាប់ផ្តើម។</div>`;
+}
+
+/* ---------- student form ---------- */
+let formPhoto="";
+function openForm(id){
+  const s=id?S.students.find(x=>x.id===id):null;formPhoto=s?s.photo:"";
+  $("#layer").innerHTML=`
+  <div class="scrim" id="scrim"><form class="modal" id="sf" role="dialog" aria-modal="true" aria-labelledby="mt">
+    <h2 id="mt">${s?"កែប្រែព័ត៌មានសិស្ស":"បន្ថែមសិស្សថ្មី"}</h2>
+    <div class="form">
+      <div class="ph"><div class="photo" id="pv">${formPhoto?`<img src="${formPhoto}" alt="">`:"រូបថត ៤×៦"}</div>
+        <div class="row" style="margin-top:8px"><label class="btn sm" for="pf" style="cursor:pointer">${ic("up")}រូបថត</label><button type="button" class="btn sm ghost" data-act="nophoto">លុប</button></div>
+        <input type="file" id="pf" accept="image/*" class="sr"></div>
+      <div class="field"><label for="f_no">អត្តលេខ</label><input class="in" id="f_no" value="${esc(s&&s.no)}" required></div>
+      <div class="field"><label for="f_sex">ភេទ</label><select class="in" id="f_sex"><option>ប្រុស</option><option ${s&&s.sex==="ស្រី"?"selected":""}>ស្រី</option></select></div>
+      <div class="field w2"><label for="f_name">គោត្តនាម-នាម</label><input class="in" id="f_name" value="${esc(s&&s.name)}" required></div>
+      <div class="field"><label for="f_dob">ថ្ងៃខែឆ្នាំកំណើត</label><input class="in" id="f_dob" value="${esc(s&&s.dob)}" placeholder="១១/សីហា/២០១២"></div>
+      <div class="field"><label for="f_cls">ថ្នាក់ទី</label><input class="in" id="f_cls" list="cl" value="${esc(s&&s.cls)}" placeholder='៧"A"'><datalist id="cl">${CLASSES.map(c=>`<option value="${esc(c)}">`).join("")}</datalist></div>
+      <div class="field w2" style="grid-column:1/-1"><label for="f_addr">ទីលំនៅបច្ចុប្បន្ន</label><input class="in" id="f_addr" value="${esc(s&&s.addr)}"></div>
+      <div class="field" style="grid-column:span 1"><label for="f_father">ឪពុកឈ្មោះ</label><input class="in" id="f_father" value="${esc(s&&s.father)}"></div>
+      <div class="field" style="grid-column:span 2"><label for="f_mother">ម្តាយឈ្មោះ</label><input class="in" id="f_mother" value="${esc(s&&s.mother)}"></div>
+    </div>
+    <div class="err" id="fe" role="alert"></div>
+    <div class="modal-foot">
+      <span>${s?`<button type="button" class="btn danger" data-act="del" data-id="${s.id}">${ic("trash")}លុប</button>`:""}</span>
+      <span class="row"><button type="button" class="btn" data-act="close">បោះបង់</button><button class="btn primary" type="submit">រក្សាទុក</button></span>
+    </div>
+    <input type="hidden" id="f_id" value="${s?s.id:""}">
+  </form></div>`;
+  setTimeout(()=>{const f=$("#f_no");if(f)f.focus()},30);
+}
+function closeForm(){$("#layer").innerHTML=""}
+function readPhoto(file){return new Promise(res=>{
+  const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{
+    const W=240,H=300,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
+    const r=Math.max(W/im.width,H/im.height),w=im.width*r,h=im.height*r;x.fillStyle="#fff";x.fillRect(0,0,W,H);x.drawImage(im,(W-w)/2,(H-h)/2,w,h);res(c.toDataURL("image/jpeg",.82))};
+    im.onerror=()=>res("");im.src=fr.result};fr.onerror=()=>res("");fr.readAsDataURL(file)})}
+function submitForm(e){
+  e.preventDefault();
+  const no=$("#f_no").value.trim(),id=$("#f_id").value;
+  if(!no){$("#fe").textContent="សូមបញ្ចូលអត្តលេខ";return}
+  if(S.students.some(s=>s.no===no&&s.id!==id)){$("#fe").textContent="អត្តលេខនេះមានរួចហើយ";return}
+  const d={no,name:$("#f_name").value.trim(),sex:$("#f_sex").value,dob:$("#f_dob").value.trim(),addr:$("#f_addr").value.trim(),
+    cls:$("#f_cls").value.trim(),father:$("#f_father").value.trim(),mother:$("#f_mother").value.trim(),photo:formPhoto};
+  if(id){Object.assign(S.students.find(s=>s.id===id),d,{demo:false});toast("កែប្រែបានជោគជ័យ")}
+  else{S.students.push(Object.assign({id:uid()},d));toast("រក្សាទុកបានជោគជ័យ")}
+  saveStudents();closeForm();go(S.view);
+}
+
+/* ---------- cards ---------- */
+function cardHTML(s,edit){
+  const c=S.cfg,Y=c.lay;
+  const box=(k,ex)=>{const L=Y[k],cl=(L.ff?" ffs":"")+(L.fc?" fcs":"")+(L.fw?" fws":"");return `class="el ${k}${ex||""}${cl}${edit&&S.selEl===k?" on":""}" data-el="${k}" style="left:${L.x}mm;top:${L.y}mm;width:${L.w}mm;height:${L.h}mm;--k:${(L.fs||100)/100};${L.ff?"font-family:"+L.ff+";":""}${L.fc?"color:"+esc(L.fc)+";":""}"`};
+  const rz=edit?'<i class="rz"></i>':"";
+  const T=(k,t)=>`<div ${box(k," txt")}>${t}${rz}</div>`;
+  return `
+<article class="card${edit?" edm":""}${c.frame||c.hideBorder?" nob":""}" style="background:${esc(c.bgc)}">
+  ${c.bg?`<img class="bgimg" src="${c.bg}" alt="" style="opacity:${c.bgop/100};object-fit:${esc(c.bgfit||"cover")}">`:""}
+  ${c.frame?`<div ${box("frame")}><img src="${c.frame}" alt="">${rz}</div>`:""}
+  <div ${box("head")}><div class="c-king">${esc(c.kingdom)}</div><div class="c-nation">${esc(c.nation)}</div><div class="c-rule"></div>${rz}</div>
+  <div ${box("dept")}>${esc(c.dept)}<br>${esc(c.province)}${rz}</div>
+  <div ${box("logo",c.logo?"":" ph")}>${c.logo?`<img src="${c.logo}" alt="">`:"ឡូហ្គោ"}${rz}</div>
+  <div ${box("title")}>${esc(c.title)}${rz}</div>
+  ${T("r_class","ថ្នាក់ទី៖ "+esc(s.cls))}${T("r_id","អត្តលេខ៖ "+esc(s.no))}
+  ${T("r_name","គោត្តនាម-នាម៖ "+esc(s.name))}${T("r_sex","ភេទ៖ "+esc(s.sex))}
+  ${T("r_dob","ថ្ងៃខែឆ្នាំកំណើត៖ "+esc(s.dob))}${T("r_addr","អាសយដ្ឋានបច្ចុប្បន្ន៖ "+esc(s.addr))}
+  ${T("r_father","ឪពុកឈ្មោះ៖ "+esc(s.father))}${T("r_mother","ម្តាយឈ្មោះ៖ "+esc(s.mother))}
+  <div ${box("photo")}>${s.photo?`<img src="${s.photo}" alt="">`:"រូបថត"}${rz}</div>
+  <div ${box("school")}><div class="sch">ជាសិស្ស${esc(c.school)}</div><div class="yr">ឆ្នាំសិក្សា៖ ${esc(c.year)}</div>${rz}</div>
+  <div ${box("sign")}><div>${esc(c.date1)}</div><div>${esc(c.date2)}</div><div class="sg">${esc(c.signer)}</div>${rz}</div>
+  ${c.stamp||edit?`<div ${box("stamp",c.stamp?"":" ph")}>${c.stamp?`<img src="${c.stamp}" alt="">`:"ត្រា"}${rz}</div>`:""}
+</article>`}
+function selected(){
+  if(S.scope==="class")return S.students.filter(s=>s.cls===S.scls);
+  if(S.scope==="pick")return S.students.filter(s=>S.sel.has(s.id));
+  return S.students;
+}
+function cardsView(){
+  const cls=classesUsed();if(!S.scls&&cls.length)S.scls=cls[0];
+  return `
+  <div class="page-head"><div><h1>បង្កើតកាត</h1><p>ជ្រើសសិស្ស មើលជាមុន រួចបោះពុម្ពលើក្រដាស A4 (៤កាត/ទំព័រ)</p></div>
+    <div class="row noprint" id="cact"></div></div>
+  <div class="cw">
+    <aside class="grid" style="gap:16px"><div class="panel seg">
+      <label><input type="radio" name="sc" value="all" data-in="scope" ${S.scope==="all"?"checked":""}> សិស្សទាំងអស់</label>
+      <label><input type="radio" name="sc" value="class" data-in="scope" ${S.scope==="class"?"checked":""}> តាមថ្នាក់</label>
+      <select class="in" id="scls" data-in="scls" aria-label="ជ្រើសថ្នាក់" ${S.scope!=="class"?"disabled":""}>${cls.map(c=>`<option ${S.scls===c?"selected":""}>${esc(c)}</option>`).join("")}</select>
+      <label><input type="radio" name="sc" value="pick" data-in="scope" ${S.scope==="pick"?"checked":""}> ជ្រើសរើសដោយដៃ</label>
+      ${S.scope==="pick"?`<div class="row"><button class="btn sm" data-act="selall">ជ្រើសទាំងអស់</button><button class="btn sm" data-act="selnone">ដកចេញ</button></div>
+      <div class="pick">${S.students.map(s=>`<label><input type="checkbox" data-in="pick" value="${s.id}" ${S.sel.has(s.id)?"checked":""}> <span>${esc(s.name)} <small style="color:var(--muted)">${esc(s.cls)}</small></span></label>`).join("")}</div>`:""}
+    </div>${designPanel()}</aside>
+    <section class="stage" id="stage" aria-label="មើលកាតជាមុន"></section>
+  </div>`;
+}
+function designPanel(){const c=S.cfg;
+  const up=(k,l)=>`<label class="btn sm" for="up_${k}" style="cursor:pointer">${ic("up")}${l}</label><input type="file" id="up_${k}" data-up="${k}" accept="image/*" class="sr">`;
+  const pre=["#FFFFFF","#F1F5FD","#FFF8E1","#E8F5E9","#FCE4EC","#E3F2FD","#F3E5F5","#FFF3E0"];
+  const fit=[["cover","ពេញកាត (កាត់គែមលើស)"],["contain","ឱ្យសមទាំងអស់"],["fill","ទាញពេញកាត"]];
+  return `<section class="panel sect" id="dsg"><h2>ការរចនាកាត</h2>
+  <div class="field"><label>ពណ៌ផ្ទៃកាត (Colour)</label>
+    <div class="row"><input type="color" id="bgc" data-in="bgc" value="${esc(c.bgc)}" aria-label="ជ្រើសពណ៌ផ្ទៃ" class="swatch"><input class="in" id="bgx" data-in="bgx" value="${esc(c.bgc)}" maxlength="7" style="width:112px" aria-label="កូដពណ៌"></div>
+    <div class="row">${pre.map(p=>`<button type="button" class="dot" data-act="bgpre" data-c="${p}" style="background:${p}" aria-label="ពណ៌ ${p}"></button>`).join("")}</div></div>
+  <div class="field"><label>រូបភាពផ្ទៃ (Image)</label>
+    <div class="row">${up("bg",c.bg?"ប្តូររូបផ្ទៃ":"Upload រូបផ្ទៃ")}${c.bg?`<img src="${c.bg}" alt="" class="bgth"><button class="btn sm ghost" data-act="nobg">លុប</button>`:""}</div>
+    ${c.bg?`<label for="bgfit" class="hint">របៀបដាក់រូប</label><select class="in" id="bgfit" data-in="bgfit">${fit.map(f=>`<option value="${f[0]}" ${(c.bgfit||"cover")===f[0]?"selected":""}>${f[1]}</option>`).join("")}</select>
+    <label for="bgop" class="hint">ភាពច្បាស់នៃរូបផ្ទៃ <b id="bgv">${c.bgop}</b>%</label><input type="range" id="bgop" min="5" max="100" data-in="bgop" value="${c.bgop}">`:""}</div>
+  <div class="field"><label>ឡូហ្គោ</label><div class="row">${up("logo","ជ្រើសឡូហ្គោ")}${c.logo?`<button class="btn sm ghost" data-act="nologo">លុប</button>`:""}</div></div>
+  <div class="field"><label>ត្រាសាលា</label><div class="row">${up("stamp","ជ្រើសត្រា")}${c.stamp?`<button class="btn sm ghost" data-act="nostamp">លុប</button>`:""}</div>
+    <span class="ed-note">ផ្ទៃសនៃរូបត្រានឹងត្រូវធ្វើឱ្យថ្លាដោយស្វ័យប្រវត្តិ</span></div>
+  <div class="field"><label>ស៊ុម (Border design PNG)</label><div class="row">${up("frame",c.frame?"ប្តូរស៊ុម":"Upload ស៊ុម PNG")}${c.frame?`<img src="${c.frame}" alt="" class="bgth" style="object-fit:contain;background:var(--surface2)"><button class="btn sm ghost" data-act="noframe">លុប</button>`:""}</div>
+    <label class="hint" style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-in="hideb" ${c.hideBorder?"checked":""}> លាក់ស៊ុមមាសលំនាំដើម</label>
+    <span class="ed-note">ប្រើ PNG ថ្លាចំកណ្តាល។ ចុច “កែទីតាំង និងទំហំ” ដើម្បីទាញ ឬពង្រីកស៊ុម។</span></div>
+  <button class="btn ${S.edit?"teal":"primary"}" data-act="layedit">${S.edit?"បញ្ចប់ការកែ":"កែទីតាំង និងទំហំ (រូបភាព និងអក្សរ)"}</button>
+  <div id="edpanel" class="sect" style="margin:0"></div></section>`}
+const ELN={head:"ក្បាលកាត (ព្រះរាជាណាចក្រ)",dept:"មន្ទីរ / ខេត្ត",logo:"ឡូហ្គោ",title:"ចំណងជើងកាត",r_class:"ថ្នាក់ទី",r_id:"អត្តលេខ",r_name:"គោត្តនាម-នាម",r_sex:"ភេទ",r_dob:"ថ្ងៃខែឆ្នាំកំណើត",r_addr:"អាសយដ្ឋាន",r_father:"ឪពុកឈ្មោះ",r_mother:"ម្តាយឈ្មោះ",frame:"ស៊ុម (Border)",photo:"រូបថត",school:"ឈ្មោះសាលា",sign:"កាលបរិច្ឆេទ / ហត្ថលេខា",stamp:"ត្រាសាលា"};
+const NOFS=["photo","logo","stamp","frame"];
+const FONTS=[["","ដើម (តាមលំនាំដើម)"],["'Khmer OS Siemreap','Siemreap'","Khmer OS Siemreap"],["'Khmer OS Battambang','Battambang'","Khmer OS Battambang"],["'Khmer OS Muol Light','Moul'","Khmer OS Muol Light"],["'Khmer OS Muol','Moul'","Khmer OS Muol"],["'Khmer OS Muol Pali','Moulpali'","Khmer OS Muol Pali"],["'Khmer OS Bokor','Bokor'","Khmer OS Bokor"],["'Khmer OS Content','Content'","Khmer OS Content"],["'Khmer OS Fasthand','Fasthand'","Khmer OS Fasthand"],["'Khmer OS Freehand','Freehand'","Khmer OS Freehand"],["'Khmer OS Metal Chrieng','Metal'","Khmer OS Metal Chrieng"],["'Hanuman'","Hanuman"],["'Koulen'","Koulen"],["'Nokora'","Nokora"],["'Suwannaphum'","Suwannaphum"],["'Dangrek'","Dangrek"]];
+function drawEditPanel(){
+  const p=$("#edpanel");if(!p)return;if(!S.edit){p.innerHTML="";return}
+  const L=S.cfg.lay[S.selEl],isTxt=!NOFS.includes(S.selEl),keys=["x","y","w","h"].concat(isTxt?["fs"]:[]),LB={x:"ឆ្វេង X (មម)",y:"លើ Y (មម)",w:"ទទឹង (មម)",h:"កម្ពស់ (មម)",fs:"ទំហំអក្សរ %"};
+  const names=Object.keys(ELN).filter(k=>k!=="frame"||S.cfg.frame);
+  p.innerHTML=`<div class="field"><label for="selel">វត្ថុដែលកំពុងកែ</label><select class="in" id="selel" data-in="selel">${names.map(k=>`<option value="${k}" ${S.selEl===k?"selected":""}>${ELN[k]}</option>`).join("")}</select></div>
+  <div class="ed-note">ចុចលើរូប ឬអក្សរក្នុងកាតដើម្បីជ្រើស។ ទាញដើម្បីផ្លាស់ទី ទាញចំណុចក្រហមដើម្បីប្តូរទំហំ ឬបញ្ចូលលេខខាងក្រោម។</div>
+  <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">${keys.map(k=>`<div class="field"><label for="ly_${k}">${LB[k]}</label><input class="in" type="number" step="0.5" id="ly_${k}" data-lay="${k}" value="${L[k]==null?100:L[k]}"></div>`).join("")}</div>
+  ${isTxt?`<div class="field"><label for="ly_ff">Font អក្សរ</label><select class="in" id="ly_ff" data-lays="ff">${FONTS.map(f=>`<option value="${esc(f[0])}" ${(L.ff||"")===f[0]?"selected":""}>${f[1]}</option>`).join("")}</select></div>
+  <div class="row"><label class="hint" for="ly_fc">ពណ៌អក្សរ</label><input type="color" id="ly_fc" data-lays="fc" value="${L.fc||"#111111"}" class="swatch" style="width:44px;height:34px"><button class="btn sm ghost" data-act="fcreset">ពណ៌ដើម</button>
+    <label class="hint" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-lays="fw" ${L.fw?"checked":""}> អក្សរដិត</label></div>
+  <button class="btn sm" data-act="ffall">ប្រើ Font នេះលើអក្សរទាំងអស់</button>`:""}
+  <button class="btn sm" data-act="rlay">កំណត់ឡើងវិញ (${ELN[S.selEl]})</button>`;
+}
+function drawCards(){
+  const a=selected(),st=$("#stage"),ac=$("#cact");if(!st)return;
+  if(S.edit){const smp=a[0]||S.students[0]||SAMPLE;st.innerHTML=`<div class="sheet big" style="grid-template-columns:90mm">${cardHTML(smp,true)}</div>`}
+  else st.innerHTML=a.length?`<div class="sheet">${a.map(c=>cardHTML(c,false)).join("")}</div>`:`<div class="empty">មិនទាន់ជ្រើសសិស្សទេ</div>`;
+  ac.innerHTML=`<span class="pill">${kh(a.length)} កាត</span>`+(LOCAL?`<button class="btn primary" data-act="print" ${a.length?"":"disabled"}>${ic("print")}បោះពុម្ព / PDF</button>`:
+    `<span class="hint" style="max-width:260px">ដើម្បីបោះពុម្ព ឬរក្សាជា PDF សូមបើកឯកសារ HTML ក្នុងកុំព្យូទ័រ (ទាញពីការសន្ទនា)។</span>`);
+}
+
+/* ---------- settings ---------- */
+function settingsView(){
+  const c=S.cfg,F=(k,l,w)=>`<div class="field ${w?"w2":""}"><label for="s_${k}">${l}</label><input class="in" id="s_${k}" data-cfg="${k}" value="${esc(c[k])}"></div>`;
+  return `
+  <div class="page-head"><div><h1>ការកំណត់</h1><p>ព័ត៌មានសាលា ដែលបង្ហាញលើកាតសិស្ស</p></div><button class="btn primary" data-act="savecfg">រក្សាទុក</button></div>
+  <div class="grid g2">
+    <section class="panel sect"><h2>ព័ត៌មានលើកាត</h2>
+      ${F("kingdom","ព្រះរាជាណាចក្រ")}${F("nation","ជាតិ សាសនា ព្រះមហាក្សត្រ")}${F("dept","មន្ទីរ")}${F("province","ខេត្ត")}${F("title","ចំណងជើងកាត")}
+      ${F("school","ឈ្មោះសាលា (បន្ទាប់ពី “ជាសិស្ស”)")}${F("year","ឆ្នាំសិក្សា")}${F("date1","កាលបរិច្ឆេទ (ចន្ទគតិ)")}${F("date2","ទីកន្លែង និងកាលបរិច្ឆេទ")}${F("signer","ហត្ថលេខា")}
+      <div class="field"><label>ឡូហ្គោសាលា / ក្រសួង</label><div class="row">${c.logo?`<img src="${c.logo}" alt="" style="width:52px;height:52px;object-fit:contain;border:1px solid var(--line);border-radius:10px">`:""}
+        <label class="btn sm" for="lg" style="cursor:pointer">${ic("up")}ជ្រើសរូប</label>${c.logo?`<button class="btn sm ghost" data-act="nologo">លុប</button>`:""}<input type="file" id="lg" data-up="logo" accept="image/*" class="sr"></div></div>
+    </section>
+    <div class="grid" style="align-content:start">
+      <section class="panel sect"><h2>គណនីចូលប្រើ</h2>${F("user","អ្នកប្រើ")}${F("pass","ពាក្យសម្ងាត់")}</section>
+      <section class="panel sect"><h2>ទិន្នន័យ</h2>
+        <div class="row"><button class="btn" data-act="copycsv">${ic("copy")}ចម្លង CSV</button>${LOCAL?`<button class="btn" data-act="dlcsv">${ic("down")}ទាញយក CSV</button>`:""}
+          <label class="btn" for="imp" style="cursor:pointer">${ic("up")}នាំចូល Excel/CSV</label><input type="file" id="imp" accept=".csv,.xlsx" class="sr"></div>
+        ${LOCAL?`<div class="row"><button class="btn" data-act="xlexp">${ic("down")}ទាញយក Excel</button></div>`:""}
+        <div class="hint">ជួរឈរ CSV៖ អត្តលេខ, ឈ្មោះ, ភេទ, ថ្ងៃកំណើត, ទីលំនៅ, ថ្នាក់, ឪពុក, ម្តាយ (រូបថតមិនរាប់បញ្ចូល)</div>
+        <div><button class="btn danger" data-act="wipe" id="wipe">${ic("trash")}លុបទិន្នន័យសិស្សទាំងអស់</button></div></section>${backupSection()}${appSection()}
+    </div>
+  </div>`;
+}
+function toCSV(){
+  const q=v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"';
+  return "﻿"+["អត្តលេខ,ឈ្មោះ,ភេទ,ថ្ងៃកំណើត,ទីលំនៅ,ថ្នាក់,ឪពុក,ម្តាយ"].concat(S.students.map(s=>[s.no,s.name,s.sex,s.dob,s.addr,s.cls,s.father,s.mother].map(q).join(","))).join("\r\n");
+}
+function parseCSV(t){
+  t=t.replace(/^﻿/,"");const rows=[];let r=[],f="",q=false;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;else if(c===","){r.push(f);f=""}
+    else if(c==="\n"){r.push(f);rows.push(r);r=[];f=""}else if(c!=="\r")f+=c}
+  if(f||r.length){r.push(f);rows.push(r)}return rows.filter(r=>r.some(x=>x.trim()));
+}
+
+/* ---------- images ---------- */
+function procImg(file,o){return new Promise(res=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{
+  const r=Math.min(1,o.max/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*r);c.height=Math.round(im.height*r);
+  const x=c.getContext("2d");if(!o.png){x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height)}x.drawImage(im,0,0,c.width,c.height);
+  if(o.clean){const d=x.getImageData(0,0,c.width,c.height),p=d.data;for(let i=0;i<p.length;i+=4){const m=Math.min(p[i],p[i+1],p[i+2]);if(m>235)p[i+3]=0;else if(m>200)p[i+3]=Math.min(p[i+3],Math.round(255*(235-m)/35))}x.putImageData(d,0,0)}
+  res(c.toDataURL(o.png?"image/png":"image/jpeg",.85))};im.onerror=()=>res("");im.src=fr.result};fr.onerror=()=>res("");fr.readAsDataURL(file)})}
+
+/* ---------- Excel / CSV import ---------- */
+const HDR=[["photo",/រូបថត|ទីតាំង/],["no",/អត្តលេខ/],["name",/គោត្តនាម|នាម/],["sex",/ភេទ/],["dob",/កំណើត/],["addr",/លំនៅ|អាសយដ្ឋាន/],["cls",/ថ្នាក់/],["father",/ឪពុក/],["mother",/ម្ត?[ាដ]យ|ម្ដាយ/]];
+const sexN=v=>{const t=String(v||"").trim();return /^(f|female|ស្រី|ស)$/i.test(t)?"ស្រី":/^(m|male|ប្រុស|ប)$/i.test(t)?"ប្រុស":t};
+function mapHeader(cells){const m={};cells.forEach((c,i)=>{const t=String(c||"").replace(/[\s:៖]/g,"");if(!t)return;for(const [k,re] of HDR){if(!(k in m)&&re.test(t)){m[k]=i;break}}});return m}
+const dobv=x=>{if(/^\d{5}(\.\d+)?$/.test(x)){const n=Math.floor(+x);if(n>=10000&&n<70000){const d=new Date(Date.UTC(1899,11,30)+n*864e5);return String(d.getUTCDate()).padStart(2,"0")+"/"+String(d.getUTCMonth()+1).padStart(2,"0")+"/"+d.getUTCFullYear()}}return x};
+function importRows(rows){
+  let hi=-1,map=null;
+  for(let i=0;i<Math.min(6,rows.length);i++){const m=mapHeader(rows[i]);if(Object.keys(m).length>=3&&"no" in m){hi=i;map=m;break}}
+  if(!map){const o=(rows[0]||[]).length>=9?["photo","no","name","sex","dob","addr","cls","father","mother"]:["no","name","sex","dob","addr","cls","father","mother"];map={};o.forEach((k,i)=>map[k]=i)}
+  let add=0,upd=0,skip=0;
+  rows.slice(hi+1).forEach(r=>{
+    const g=k=>k in map?String(r[map[k]]==null?"":r[map[k]]).trim():"";
+    const no=g("no");if(!no||!g("name")){if(r.some(x=>String(x).trim()))skip++;return}
+    const d={no,name:g("name"),sex:sexN(g("sex")),dob:dobv(g("dob")),addr:g("addr"),cls:g("cls"),father:g("father"),mother:g("mother")};
+    const ex=S.students.find(x=>x.no===no);
+    if(ex){Object.assign(ex,d,{demo:false});upd++}else{S.students.push(Object.assign({id:uid(),photo:""},d));add++}});
+  return {add,upd,skip};
+}
+
+/* ---------- card layout drag / resize ---------- */
+let drag=null;const r1=v=>Math.round(v*10)/10;
+function applyPos(el,L){el.style.left=L.x+"mm";el.style.top=L.y+"mm";el.style.width=L.w+"mm";el.style.height=L.h+"mm"}
+function syncNums(){const L=S.cfg.lay[S.selEl];["x","y","w","h","fs"].forEach(k=>{const i=$("#ly_"+k);if(i&&L[k]!=null)i.value=L[k]})}
+document.addEventListener("pointerdown",e=>{
+  if(!S.edit)return;const el=e.target.closest(".el");if(!el||!el.closest(".edm"))return;
+  const k=el.dataset.el,card=el.closest(".card"),w=card.getBoundingClientRect().width;
+  drag={k,mode:e.target.classList.contains("rz")?"rz":"mv",ppm:w/90,x0:e.clientX,y0:e.clientY,o:Object.assign({},S.cfg.lay[k]),el};
+  const changed=S.selEl!==k;S.selEl=k;
+  if(changed){document.querySelectorAll(".edm .el").forEach(n=>n.classList.toggle("on",n===el));drawEditPanel()}
+  try{el.setPointerCapture(e.pointerId)}catch(x){}
+  e.preventDefault();
+});
+document.addEventListener("pointermove",e=>{
+  if(!drag)return;const dx=(e.clientX-drag.x0)/drag.ppm,dy=(e.clientY-drag.y0)/drag.ppm,L=S.cfg.lay[drag.k];
+  if(drag.mode==="mv"){L.x=r1(drag.o.x+dx);L.y=r1(drag.o.y+dy)}else{L.w=Math.max(4,r1(drag.o.w+dx));L.h=Math.max(4,r1(drag.o.h+dy))}
+  applyPos(drag.el,L);syncNums();
+});
+const endDrag=()=>{if(drag){saveCfg();drag=null}};
+document.addEventListener("pointerup",endDrag);document.addEventListener("pointercancel",endDrag);
+
+/* ---------- minimal xlsx reader / writer (no external library) ---------- */
+async function inflateRaw(data){const ds=new DecompressionStream("deflate-raw"),w=ds.writable.getWriter();w.write(data);w.close();return new Uint8Array(await new Response(ds.readable).arrayBuffer())}
+async function unzip(buf){
+  const d=new DataView(buf),b=new Uint8Array(buf),td=new TextDecoder();let e=-1;
+  for(let i=b.length-22;i>=Math.max(0,b.length-65557);i--){if(d.getUint32(i,true)===0x06054b50){e=i;break}}
+  if(e<0)throw new Error("zip");
+  const n=d.getUint16(e+10,true);let p=d.getUint32(e+16,true);const out={};
+  for(let i=0;i<n;i++){
+    if(d.getUint32(p,true)!==0x02014b50)throw new Error("zip");
+    const m=d.getUint16(p+10,true),cs=d.getUint32(p+20,true),nl=d.getUint16(p+28,true),xl=d.getUint16(p+30,true),cl=d.getUint16(p+32,true),lo=d.getUint32(p+42,true);
+    const name=td.decode(b.subarray(p+46,p+46+nl));
+    out[name]=async()=>{const s=lo+30+d.getUint16(lo+26,true)+d.getUint16(lo+28,true),raw=b.subarray(s,s+cs);return m===0?raw:inflateRaw(raw)};
+    p+=46+nl+xl+cl;
+  }
+  return out;
+}
+const xmlDoc=t=>new DOMParser().parseFromString(t,"application/xml");
+const colIdx=r=>{let n=0;for(const ch of r.replace(/\d+/g,""))n=n*26+ch.charCodeAt(0)-64;return n-1};
+async function readXlsx(buf){
+  const z=await unzip(buf),td=new TextDecoder(),txt=async n=>z[n]?td.decode(await z[n]()):"";
+  const wb=xmlDoc(await txt("xl/workbook.xml")),rels=xmlDoc(await txt("xl/_rels/workbook.xml.rels"));
+  let target="worksheets/sheet1.xml";const sh=wb.getElementsByTagName("sheet")[0];
+  if(sh){const rid=sh.getAttribute("r:id");for(const r of rels.getElementsByTagName("Relationship"))if(r.getAttribute("Id")===rid)target=r.getAttribute("Target")}
+  target=target.replace(/^\//,"");const path=target.startsWith("xl/")?target:"xl/"+target;
+  const ss=[];
+  for(const si of xmlDoc(await txt("xl/sharedStrings.xml")).getElementsByTagName("si")){
+    let t="";const walk=nd=>{for(const c of nd.childNodes){if(c.nodeName==="rPh")continue;if(c.nodeName==="t")t+=c.textContent;else if(c.childNodes&&c.childNodes.length)walk(c)}};walk(si);ss.push(t)}
+  const rows=[];let ri=0;
+  for(const row of xmlDoc(await txt(path)).getElementsByTagName("row")){
+    const rn=row.getAttribute("r")?+row.getAttribute("r")-1:ri;ri=rn+1;const arr=[];
+    for(const c of row.getElementsByTagName("c")){
+      const t=c.getAttribute("t"),v=c.getElementsByTagName("v")[0];let val="";
+      if(t==="s")val=v?ss[+v.textContent]||"":"";
+      else if(t==="inlineStr")val=[...c.getElementsByTagName("t")].map(x=>x.textContent).join("");
+      else if(v)val=v.textContent;
+      const ref=c.getAttribute("r"),ci=ref?colIdx(ref):arr.length;while(arr.length<ci)arr.push("");arr[ci]=val}
+    while(rows.length<rn)rows.push([]);rows[rn]=arr}
+  return rows;
+}
+const CRCT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=b=>{let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRCT[(c^b[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0};
+function zipStore(files,mime){
+  const te=new TextEncoder(),parts=[],cd=[];let off=0;
+  for(const [name,str] of files){
+    const nb=te.encode(name),db=te.encode(str),crc=crc32(db),lh=new DataView(new ArrayBuffer(30));
+    lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(6,0x0800,true);lh.setUint32(14,crc,true);lh.setUint32(18,db.length,true);lh.setUint32(22,db.length,true);lh.setUint16(26,nb.length,true);
+    parts.push(new Uint8Array(lh.buffer),nb,db);
+    const ch=new DataView(new ArrayBuffer(46));
+    ch.setUint32(0,0x02014b50,true);ch.setUint16(4,20,true);ch.setUint16(6,20,true);ch.setUint16(8,0x0800,true);ch.setUint32(16,crc,true);ch.setUint32(20,db.length,true);ch.setUint32(24,db.length,true);ch.setUint16(28,nb.length,true);ch.setUint32(42,off,true);
+    cd.push(new Uint8Array(ch.buffer),nb);off+=30+nb.length+db.length}
+  const cs=cd.reduce((a,x)=>a+x.length,0),end=new DataView(new ArrayBuffer(22));
+  end.setUint32(0,0x06054b50,true);end.setUint16(8,files.length,true);end.setUint16(10,files.length,true);end.setUint32(12,cs,true);end.setUint32(16,off,true);
+  return new Blob([...parts,...cd,new Uint8Array(end.buffer)],{type:mime});
+}
+function makeXlsx(rows){
+  const H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',L=i=>String.fromCharCode(65+i),ns="http://schemas.openxmlformats.org/";
+  const sheet=H+`<worksheet xmlns="${ns}spreadsheetml/2006/main"><cols><col min="1" max="9" width="22" customWidth="1"/></cols><sheetData>`+
+    rows.map((r,ri)=>`<row r="${ri+1}">`+r.map((v,ci)=>`<c r="${L(ci)}${ri+1}" t="inlineStr"><is><t xml:space="preserve">${esc(v)}</t></is></c>`).join("")+"</row>").join("")+"</sheetData></worksheet>";
+  return zipStore([
+    ["[Content_Types].xml",H+`<Types xmlns="${ns}package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>`],
+    ["_rels/.rels",H+`<Relationships xmlns="${ns}package/2006/relationships"><Relationship Id="rId1" Type="${ns}officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`],
+    ["xl/workbook.xml",H+`<workbook xmlns="${ns}spreadsheetml/2006/main" xmlns:r="${ns}officeDocument/2006/relationships"><sheets><sheet name="MainData" sheetId="1" r:id="rId1"/></sheets></workbook>`],
+    ["xl/_rels/workbook.xml.rels",H+`<Relationships xmlns="${ns}package/2006/relationships"><Relationship Id="rId1" Type="${ns}officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>`],
+    ["xl/worksheets/sheet1.xml",sheet]
+  ],"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+}
+function saveBlob(blob,name){const u=URL.createObjectURL(blob),l=document.createElement("a");l.href=u;l.download=name;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),5000)}
+const XL_H=["ទីតាំងដាក់រូបថត","អត្តលេខ","គោត្តនាម-នាម","ភេទ","ថ្ងៃខែឆ្នាំកំណើត","ទីលំនៅបច្ចុប្បន្ន","ថ្នាក់ទី","ឪពុកឈ្មោះ","ម្តាយឈ្មោះ"];
+function xlTemplate(){saveBlob(makeXlsx([XL_H,["","124","សាហ៊ាវ កក្កដា","ស្រី","១១/សីហា/២០១៥","ស្វាយចេក",'៨"B"',"ចាន បុផ្ផា","ស ស"]]),"students_template.xlsx")}
+function xlExport(){saveBlob(makeXlsx([XL_H].concat(S.students.map(s=>["",s.no,s.name,s.sex,s.dob,s.addr,s.cls,s.father,s.mother]))),"students.xlsx")}
+async function importFile(file){
+  const n=file.name.toLowerCase();let rows;
+  try{
+    if(n.endsWith(".csv"))rows=parseCSV(await file.text());
+    else if(n.endsWith(".xlsx"))rows=await readXlsx(await file.arrayBuffer());
+    else{toast("សូមរក្សាទុកឯកសារជា .xlsx ឬ .csv");return}
+  }catch(e){toast("មិនអាចអានឯកសារបានទេ សូមពិនិត្យថាជា .xlsx");return}
+  const r=importRows(rows);saveStudents();go(S.view,true);
+  toast(`បន្ថែម ${kh(r.add)} · កែ ${kh(r.upd)} · រំលង ${kh(r.skip)}`);
+}
+
+/* ---------- backup / restore (move data between phone and computer) ---------- */
+function backupFile(){
+  const cf=Object.assign({},S.cfg);delete cf.user;delete cf.pass;
+  return new File([JSON.stringify({app:"cms",v:2,saved:new Date().toISOString(),students:S.students,cfg:cf})],"student-cards-backup-"+new Date().toISOString().slice(0,10)+".json",{type:"application/json"});
+}
+async function doBackup(share){
+  const f=backupFile();
+  if(share&&navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:"បម្រុងទុកកាតសិស្ស"});return}catch(e){if(e&&e.name==="AbortError")return}}
+  saveBlob(f,f.name);toast("បានបម្រុងទុក");
+}
+async function doRestore(file){
+  let o;try{o=JSON.parse(await file.text())}catch(e){toast("ឯកសារបម្រុងទុកមិនត្រឹមត្រូវ");return}
+  if(!o||o.app!=="cms"||!Array.isArray(o.students)){toast("ឯកសារបម្រុងទុកមិនត្រឹមត្រូវ");return}
+  const cred={user:S.cfg.user,pass:S.cfg.pass};
+  S.students=o.students;S.cfg=Object.assign({},DEF,o.cfg||{},cred);initLay();saveStudents();saveCfg();
+  toast("បានស្ដារទិន្នន័យ "+kh(S.students.length)+" នាក់");go("settings",true);
+}
+function backupSection(){
+  return `<section class="panel sect"><h2>បម្រុងទុក និងផ្ទេរទិន្នន័យ</h2>
+    <div class="row">${LOCAL?`<button class="btn" data-act="bak">${ic("down")}បម្រុងទុក (.json)</button>`:""}${LOCAL&&navigator.share?`<button class="btn" data-act="bakshare">${ic("up")}ផ្ញើ…</button>`:""}
+      <label class="btn" for="rst" style="cursor:pointer">${ic("up")}ស្ដារពីឯកសារបម្រុងទុក</label><input type="file" id="rst" accept=".json,application/json" class="sr"></div>
+    <div class="hint">ទិន្នន័យរក្សាទុកក្នុងឧបករណ៍នីមួយៗ។ ដើម្បីផ្ទេរពីទូរសព្ទទៅកុំព្យូទ័រ (ឬបញ្ច្រាស) សូមបម្រុងទុក រួចផ្ញើឯកសារតាម Telegram ឬ USB ហើយ “ស្ដារ” នៅម៉ាស៊ីនថ្មី។ ការស្ដារជំនួសទិន្នន័យបច្ចុប្បន្ន។ ឯកសារបម្រុងទុកមានរូបថត និងការរចនាកាត ប៉ុន្តែមិនមានពាក្យសម្ងាត់ទេ។</div></section>`;
+}
+
+/* ---------- install as an app ---------- */
+let deferredInstall=null;
+const standalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;if(S.authed&&S.view==="settings")go("settings",true)});
+addEventListener("appinstalled",()=>{deferredInstall=null;toast("បានដំឡើងកម្មវិធីរួចរាល់");if(S.authed&&S.view==="settings")go("settings",true)});
+if("serviceWorker" in navigator&&LOCAL&&/^https?:$/.test(location.protocol)){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+function appSection(){
+  const web=LOCAL&&/^https?:$/.test(location.protocol);let body;
+  if(standalone())body='<div class="hint">កំពុងប្រើជាកម្មវិធីដែលបានដំឡើង។ ដំណើរការបានដោយគ្មានអ៊ីនធឺណិត។</div>';
+  else if(!web)body='<div class="hint">ដើម្បីដំឡើងជាកម្មវិធី សូមដាក់ឯកសារទាំងនេះលើគេហទំព័រ (HTTPS) រួចបើកតំណនោះ។ មើលការណែនាំក្នុង README។</div>';
+  else if(deferredInstall)body=`<button class="btn primary" data-act="install">${ic("down")}ដំឡើងកម្មវិធី</button>`;
+  else body='<div class="hint">Android និងកុំព្យូទ័រ (Chrome, Edge)៖ ចុចម៉ឺនុយ ⋮ ➜ “Install app” ឬ “Add to Home screen”។<br>iPhone / iPad (Safari)៖ ចុច Share ➜ “Add to Home Screen”។</div>';
+  return `<section class="panel sect"><h2>កម្មវិធីលើទូរសព្ទ / កុំព្យូទ័រ</h2>${body}</section>`;
+}
+
+/* ---------- start ---------- */
+async function boot(){
+  try{
+    const load=(async()=>{
+      let st=await DB.get("students"),cf=await DB.get("cfg");
+      if(st==null&&cf==null){
+        const ls=LS.get("cms.students",null),lc=LS.get("cms.cfg",null);
+        if(ls||lc){st=ls;cf=lc;if(st)await DB.set("students",st);if(cf)await DB.set("cfg",cf)}
+      }
+      if(st)S.students=st;
+      if(cf){S.cfg=Object.assign({},DEF,cf);initLay()}
+    })();
+    await Promise.race([load,new Promise(r=>setTimeout(r,3500))]);
+  }catch(e){}
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+  go(S.view);
+}
+
+/* ---------- router ---------- */
+function go(v,keep){
+  S.view=v;try{history.replaceState(null,"","#"+v)}catch(e){}
+  if(!S.authed){$("#root").innerHTML=loginView();return}
+  $("#root").innerHTML=shell();const m=$("#main");
+  m.innerHTML=({dashboard,students:studentsView,cards:cardsView,settings:settingsView})[v]();
+  if(v==="students")drawList();if(v==="cards"){drawCards();drawEditPanel()}
+  if(!keep)window.scrollTo(0,0);
+}
+
+/* ---------- events ---------- */
+document.addEventListener("submit",e=>{
+  if(e.target.id==="lf"){e.preventDefault();
+    if($("#lu").value===S.cfg.user&&$("#lp").value===S.cfg.pass){S.authed=true;try{sessionStorage.setItem("cms.auth","1")}catch(x){}go(S.view)}
+    else{$("#le").textContent="អ្នកប្រើ ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ";$("#lp").value=""}}
+  if(e.target.id==="sf")submitForm(e);
+});
+document.addEventListener("click",e=>{
+  if(e.target.id==="scrim"){closeForm();return}
+  const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act,id=b.dataset.id;
+  if(a==="nav")go(b.dataset.v);
+  else if(a==="theme"){setTheme(isDark()?"light":"dark");go(S.view)}
+  else if(a==="logout"){S.authed=false;try{sessionStorage.removeItem("cms.auth")}catch(x){}go(S.view)}
+  else if(a==="add")openForm();
+  else if(a==="edit")openForm(id);
+  else if(a==="close")closeForm();
+  else if(a==="nophoto"){formPhoto="";$("#pv").textContent="រូបថត ៤×៦"}
+  else if(a==="del"){
+    if(!b.classList.contains("sure")){b.classList.add("sure");b.lastChild.textContent="ចុចម្តងទៀតដើម្បីបញ្ជាក់";return}
+    S.students=S.students.filter(s=>s.id!==id);saveStudents();closeForm();toast("លុបបានជោគជ័យ");go(S.view)}
+  else if(a==="pg"){S.page+=+b.dataset.d;drawList()}
+  else if(a==="clrdemo"){S.students=S.students.filter(s=>!s.demo);saveStudents();go(S.view)}
+  else if(a==="selall"){S.students.forEach(s=>S.sel.add(s.id));go("cards")}
+  else if(a==="selnone"){S.sel.clear();go("cards")}
+  else if(a==="print"){if(S.edit){S.edit=false;go("cards",true)}window.print()}
+  else if(a==="layedit"){S.edit=!S.edit;go("cards",true)}
+  else if(a==="bgpre"){S.cfg.bgc=b.dataset.c;saveCfg();go(S.view,true)}
+  else if(a==="selel"){S.selEl=b.dataset.k;drawEditPanel();drawCards()}
+  else if(a==="rlay"){S.cfg.lay[S.selEl]=Object.assign({},DEFLAY[S.selEl]);saveCfg();drawEditPanel();drawCards()}
+  else if(a==="nobg"){S.cfg.bg="";saveCfg();go(S.view,true)}
+  else if(a==="noframe"){S.cfg.frame="";saveCfg();go(S.view,true)}
+  else if(a==="fcreset"){S.cfg.lay[S.selEl].fc="";saveCfg();drawEditPanel();drawCards()}
+  else if(a==="ffall"){const f=S.cfg.lay[S.selEl].ff||"";Object.keys(S.cfg.lay).forEach(k=>{if(!NOFS.includes(k))S.cfg.lay[k].ff=f});saveCfg();drawCards();toast("បានប្រើ Font នេះលើអក្សរទាំងអស់")}
+  else if(a==="nostamp"){S.cfg.stamp="";saveCfg();go(S.view,true)}
+  else if(a==="xltpl")xlTemplate();
+  else if(a==="xlexp")xlExport();
+  else if(a==="bak")doBackup(false);
+  else if(a==="bakshare")doBackup(true);
+  else if(a==="install"&&deferredInstall){deferredInstall.prompt();deferredInstall.userChoice.finally(()=>{deferredInstall=null})}
+  else if(a==="savecfg"){saveCfg();toast("រក្សាទុកការកំណត់រួចរាល់")}
+  else if(a==="nologo"){S.cfg.logo="";saveCfg();go(S.view,true)}
+  else if(a==="copycsv"){const t=toCSV();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("បានចម្លង CSV"),()=>toast("មិនអាចចម្លងបាន"))}
+  else if(a==="dlcsv"){const u=URL.createObjectURL(new Blob([toCSV()],{type:"text/csv;charset=utf-8"}));const l=document.createElement("a");l.href=u;l.download="students.csv";l.click();URL.revokeObjectURL(u)}
+  else if(a==="wipe"){
+    if(!b.classList.contains("sure")){b.classList.add("sure");b.lastChild.textContent="ចុចម្តងទៀតដើម្បីលុបទាំងអស់";return}
+    S.students=[];saveStudents();toast("បានលុបទិន្នន័យ");go("settings")}
+});
+document.addEventListener("input",e=>{
+  const t=e.target;
+  if(t.dataset.cfg){S.cfg[t.dataset.cfg]=t.value;return}
+  if(t.dataset.lay){S.cfg.lay[S.selEl][t.dataset.lay]=parseFloat(t.value)||0;saveCfg();drawCards();return}
+  if(t.dataset.lays){const k=t.dataset.lays;S.cfg.lay[S.selEl][k]=t.type==="checkbox"?t.checked:t.value;saveCfg();drawCards();return}
+  const k=t.dataset.in;if(!k)return;
+  if(k==="q"){S.q=t.value;S.page=1;drawList()}
+  else if(k==="fc"){S.fc=t.value;S.page=1;drawList()}
+  else if(k==="fs"){S.fs=t.value;S.page=1;drawList()}
+  else if(k==="scope"){S.scope=t.value;go("cards")}
+  else if(k==="scls"){S.scls=t.value;drawCards()}
+  else if(k==="bgc"){S.cfg.bgc=t.value;const x=$("#bgx");if(x)x.value=t.value;saveCfg();drawCards()}
+  else if(k==="bgx"){if(/^#[0-9a-f]{6}$/i.test(t.value)){S.cfg.bgc=t.value;const c=$("#bgc");if(c)c.value=t.value;saveCfg();drawCards()}}
+  else if(k==="hideb"){S.cfg.hideBorder=t.checked;saveCfg();drawCards()}
+  else if(k==="bgfit"){S.cfg.bgfit=t.value;saveCfg();drawCards()}
+  else if(k==="selel"){S.selEl=t.value;drawEditPanel();drawCards()}
+  else if(k==="bgop"){S.cfg.bgop=+t.value;const v=$("#bgv");if(v)v.textContent=t.value;saveCfg();drawCards()}
+  else if(k==="pick"){t.checked?S.sel.add(t.value):S.sel.delete(t.value);drawCards()}
+});
+document.addEventListener("change",async e=>{
+  const t=e.target;
+  if(t.id==="pf"&&t.files[0]){formPhoto=await readPhoto(t.files[0]);$("#pv").innerHTML=formPhoto?`<img src="${formPhoto}" alt="">`:"មិនអាចបើករូបបាន"}
+  if(t.dataset.up&&t.files[0]){
+    const k=t.dataset.up,f=t.files[0];
+    if(k==="logo")S.cfg.logo=await procImg(f,{max:260,png:true});
+    else if(k==="frame")S.cfg.frame=await procImg(f,{max:1100,png:true});
+    else if(k==="stamp")S.cfg.stamp=await procImg(f,{max:360,png:true,clean:true});
+    else if(k==="bg"){S.cfg.bg=await procImg(f,{max:900});S.cfg.bgop=100}
+    saveCfg();t.value="";go(S.view,true);return}
+  if(t.id==="rst"&&t.files[0]){await doRestore(t.files[0]);t.value="";return}
+  if((t.id==="xl"||t.id==="imp")&&t.files[0]){await importFile(t.files[0]);t.value="";return}
+  if(t.id==="phs"&&t.files.length){
+    const tot=t.files.length;let n=0;for(const f of t.files){const base=f.name.replace(/\.[^.]+$/,"").trim(),st=S.students.find(x=>x.no===base);
+      if(st){const d=await readPhoto(f);if(d){st.photo=d;st.demo=false;n++}}}
+    saveStudents();t.value="";go(S.view,true);toast("ភ្ជាប់រូបថត "+kh(n)+" / "+kh(tot));return}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#scrim"))closeForm()});
+
+boot();
+</script>
+</body>
+</html>
