@@ -337,7 +337,7 @@ function scaleLay(L,k,sx,sy){
   else{o.x=q1(L.x*sx);o.y=q1(L.y*sy);o.w=q1(L.w*sx);o.h=q1(L.h*sy);if(o.fs!=null&&!IMGKEYS.includes(k))o.fs=Math.max(20,Math.round(L.fs*f))}
   return o;
 }
-const defFor=k=>scaleLay(DEFLAY[k],k,(S.cfg.cw||90)/90,(S.cfg.ch||127)/127);
+const defFor=k=>Object.assign({},DEFLAY[k]);
 function sizeCols(){const c=S.cfg,g=4;return {cols:Math.max(1,Math.floor((194+g)/(c.cw+g))),rows:Math.max(1,Math.floor((281+g)/(c.ch+g)))}}
 function applySize(){const c=S.cfg,r=document.documentElement.style;r.setProperty("--cw",c.cw+"mm");r.setProperty("--ch",c.ch+"mm");r.setProperty("--cols",sizeCols().cols)}
 function setCardSize(w,h,scale){
@@ -592,7 +592,7 @@ function designPanel(){const c=S.cfg;
     <select class="in" id="szp" data-sz="preset">${PRE.map(p=>`<option value="${p[0]}" ${(PRE.some(x=>x[0]===cur)?cur:"custom")===p[0]?"selected":""}>${p[1]}</option>`).join("")}</select>
     <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px"><div class="field"><label for="szw">ទទឹង</label><input class="in" type="number" id="szw" data-sz="w" min="30" max="190" step="0.5" value="${c.cw}"></div>
       <div class="field"><label for="szh">កម្ពស់</label><input class="in" type="number" id="szh" data-sz="h" min="30" max="270" step="0.5" value="${c.ch}"></div></div>
-    <label class="hint" style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-sz="scale" ${S.szScale===false?"":"checked"}> ប្តូរទីតាំង និងទំហំវត្ថុក្នុងកាតតាមសមាមាត្រ</label>
+    <label class="hint" style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-sz="scale" ${S.szScale===true?"checked":""}> ពង្រីក/បង្រួមវត្ថុក្នុងកាតតាមទំហំថ្មី (បើមិនធីក វត្ថុនៅទំហំ និងទីតាំងដើម)</label>
     <span class="ed-note">ក្រដាស A4 ដាក់បាន ${kh(sz.cols)}×${kh(sz.rows)} = ${kh(sz.cols*sz.rows)} កាត/ទំព័រ។ វាយលេខរួចចុច Enter ឬចុចកន្លែងផ្សេង។</span></div>
   <div class="field"><label>ពណ៌ផ្ទៃកាត (Colour)</label>
     <div class="row"><input type="color" id="bgc" data-in="bgc" value="${esc(c.bgc)}" aria-label="ជ្រើសពណ៌ផ្ទៃ" class="swatch"><input class="in" id="bgx" data-in="bgx" value="${esc(c.bgc)}" maxlength="7" style="width:112px" aria-label="កូដពណ៌"></div>
@@ -940,7 +940,7 @@ document.addEventListener("change",async e=>{
     let w=S.cfg.cw,h=S.cfg.ch;
     if(t.dataset.sz==="preset"){if(t.value==="custom")return;[w,h]=t.value.split("x").map(Number)}
     else if(t.dataset.sz==="w")w=parseFloat(t.value);else h=parseFloat(t.value);
-    setCardSize(w,h,S.szScale!==false);return}
+    setCardSize(w,h,S.szScale===true);return}
   if(t.id==="pf"&&t.files[0]){formPhoto=await readPhoto(t.files[0]);$("#pv").innerHTML=formPhoto?`<img src="${formPhoto}" alt="">`:"មិនអាចបើករូបបាន"}
   if(t.dataset.up&&t.files[0]){
     const k=t.dataset.up,f=t.files[0];
