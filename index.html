@@ -165,11 +165,11 @@ td.act{white-space:nowrap;text-align:right}
 .seg label{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;cursor:pointer}
 .seg label:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
 .stage{background:repeating-conic-gradient(var(--surface2) 0 25%,var(--bg) 0 50%) 0 0/20px 20px;border-radius:20px;padding:20px;overflow:auto;border:1px solid var(--line)}
-.sheet{display:grid;grid-template-columns:repeat(2,90mm);gap:4mm;justify-content:center;zoom:.82}
+.sheet{display:grid;grid-template-columns:repeat(var(--cols,2),var(--cw,90mm));gap:4mm;justify-content:center;zoom:.82}
 
 /* ID card (fixed print palette, independent of theme) */
 .card{-webkit-print-color-adjust:exact;print-color-adjust:exact;--c-bg:#F1F5FD;--c-ink:#1B2A5E;--c-text:#111;--c-gold:#C79A1B;--c-red:#C8102E;
-  width:90mm;height:127mm;background:var(--c-bg);color:var(--c-text);border:1.1mm solid var(--c-gold);border-radius:2mm;position:relative;
+  width:var(--cw,90mm);height:var(--ch,127mm);background:var(--c-bg);color:var(--c-text);border:1.1mm solid var(--c-gold);border-radius:2mm;position:relative;
   padding:3mm 4mm;display:flex;flex-direction:column;overflow:hidden;font-family:var(--f-body);break-inside:avoid;box-shadow:0 8px 24px rgba(0,0,0,.18)}
 .card::before,.card::after{content:"";position:absolute;width:9mm;height:9mm;border:0.6mm solid var(--c-gold);pointer-events:none}
 .card::before{left:1mm;top:1mm;border-right:0;border-bottom:0;border-radius:3mm 0 0 0}
@@ -264,7 +264,7 @@ td.act{white-space:nowrap;text-align:right}
   td{border:0;padding:0}
   td.c-ph{grid-area:ph}td.c-name{grid-area:name;font-weight:700}td.c-no{grid-area:no;color:var(--muted)}
   td.c-cls{grid-area:cls}td.c-sex{grid-area:sex}td.c-dob{grid-area:dob;color:var(--muted);font-size:13px}td.c-par{display:none}td.act{grid-area:act}
-  .sheet{grid-template-columns:90mm;zoom:.85}.sheet.big{zoom:.8}.stage{padding:12px}
+  .sheet{grid-template-columns:var(--cw,90mm);zoom:.85}.sheet.big{zoom:.8}.stage{padding:12px}
   .modal{padding:18px;border-radius:20px}
 }
 /* print: only the card sheet */
@@ -274,7 +274,7 @@ td.act{white-space:nowrap;text-align:right}
   .rail,.page-head,.cw>aside,.banner,.toast,.pager,.noprint{display:none!important}
   .shell,.cw{display:block}.main{padding:0}
   .stage{border:0;background:none;padding:0;overflow:visible}
-  .sheet{zoom:1!important;grid-template-columns:repeat(2,90mm)!important}.card{box-shadow:none}
+  .sheet{zoom:1!important;grid-template-columns:repeat(var(--cols,2),var(--cw,90mm))!important}.card{box-shadow:none}
 }
 </style>
 </head>
@@ -308,7 +308,7 @@ const uid=()=>Math.random().toString(36).slice(2,9);
 const DEF={user:"admin",pass:"1234",kingdom:"ព្រះរាជាណាចក្រកម្ពុជា",nation:"ជាតិ សាសនា ព្រះមហាក្សត្រ",
   dept:"មន្ទីរអប់រំ យុវជន និងកីឡា",province:"ខេត្តបន្ទាយមានជ័យ",title:"បណ្ណសម្គាល់ខ្លួនសិស្ស",
   school:"អនុវិទ្យាល័យហ៊ុនសែនតាបែន",year:"២០២៦-២០២៧",date1:"ថ្ងៃសុក្រ ១១រោច ខែអស្សុជ ឆ្នាំមមី អដ្ឋស័ក ព.ស. ២៥៧០",
-  date2:"តាបែន ថ្ងៃទី១៦ ខែតុលា ឆ្នាំ២០២៦",signer:"នាយកសាលា",logo:"",stamp:"",bg:"",bgc:"#F1F5FD",bgop:40,bgfit:"cover",frame:"",hideBorder:false};
+  date2:"តាបែន ថ្ងៃទី១៦ ខែតុលា ឆ្នាំ២០២៦",signer:"នាយកសាលា",logo:"",stamp:"",bg:"",bgc:"#F1F5FD",bgop:40,bgfit:"cover",frame:"",hideBorder:false,cw:90,ch:127};
 const DEFLAY={head:{x:4,y:3,w:82,h:14,fs:100},dept:{x:22,y:18,w:64,h:12,fs:100},logo:{x:4,y:17,w:15,h:15},title:{x:4,y:33,w:82,h:9,fs:100},
  r_class:{x:4,y:44,w:40,h:5.5,fs:100},r_id:{x:46,y:44,w:40,h:5.5,fs:100},r_name:{x:4,y:49.5,w:58,h:5.5,fs:100},r_sex:{x:64,y:49.5,w:22,h:5.5,fs:100},
  r_dob:{x:4,y:55,w:82,h:5.5,fs:100},r_addr:{x:4,y:60.5,w:82,h:5.5,fs:100},r_father:{x:4,y:66,w:82,h:5.5,fs:100},r_mother:{x:4,y:71.5,w:82,h:5.5,fs:100},
@@ -328,7 +328,26 @@ const S={
   authed:false,view:"dashboard",q:"",fc:"",fs:"",page:1,
   scope:"all",scls:"",sel:new Set(),built:true,edit:false,selEl:"photo"
 };
-const initLay=()=>{S.cfg.lay=Object.fromEntries(Object.keys(DEFLAY).map(k=>[k,Object.assign({},DEFLAY[k],(S.cfg.lay||{})[k])]))};
+/* ---------- card size (mm). Layout numbers are millimetres on the card, so they can be scaled when the size changes ---------- */
+const IMGKEYS=["photo","logo","stamp","frame"];
+const q1=v=>Math.round(v*10)/10;
+function scaleLay(L,k,sx,sy){
+  const f=Math.min(sx,sy),o=Object.assign({},L);
+  if(IMGKEYS.includes(k)&&k!=="frame"){const nw=L.w*f,nh=L.h*f;o.x=q1((L.x+L.w/2)*sx-nw/2);o.y=q1((L.y+L.h/2)*sy-nh/2);o.w=q1(nw);o.h=q1(nh)}
+  else{o.x=q1(L.x*sx);o.y=q1(L.y*sy);o.w=q1(L.w*sx);o.h=q1(L.h*sy);if(o.fs!=null&&!IMGKEYS.includes(k))o.fs=Math.max(20,Math.round(L.fs*f))}
+  return o;
+}
+const defFor=k=>scaleLay(DEFLAY[k],k,(S.cfg.cw||90)/90,(S.cfg.ch||127)/127);
+function sizeCols(){const c=S.cfg,g=4;return {cols:Math.max(1,Math.floor((194+g)/(c.cw+g))),rows:Math.max(1,Math.floor((281+g)/(c.ch+g)))}}
+function applySize(){const c=S.cfg,r=document.documentElement.style;r.setProperty("--cw",c.cw+"mm");r.setProperty("--ch",c.ch+"mm");r.setProperty("--cols",sizeCols().cols)}
+function setCardSize(w,h,scale){
+  const c=S.cfg;w=q1(Math.min(190,Math.max(30,w)));h=q1(Math.min(270,Math.max(30,h)));
+  if(!isFinite(w)||!isFinite(h))return;
+  const sx=w/c.cw,sy=h/c.ch;
+  if(scale&&(sx!==1||sy!==1))for(const k of Object.keys(c.lay))c.lay[k]=scaleLay(c.lay[k],k,sx,sy);
+  c.cw=w;c.ch=h;applySize();saveCfg();go(S.view,true);
+}
+const initLay=()=>{S.cfg.cw=Math.min(190,Math.max(30,+S.cfg.cw||90));S.cfg.ch=Math.min(270,Math.max(30,+S.cfg.ch||127));S.cfg.lay=Object.fromEntries(Object.keys(DEFLAY).map(k=>[k,Object.assign({},defFor(k),(S.cfg.lay||{})[k])]));applySize()};
 initLay();
 try{S.authed=sessionStorage.getItem("cms.auth")==="1"}catch(e){}
 try{const h=location.hash.slice(1);if(["dashboard","students","cards","settings"].includes(h))S.view=h}catch(e){}
@@ -549,7 +568,7 @@ function selected(){
 function cardsView(){
   const cls=classesUsed();if(!S.scls&&cls.length)S.scls=cls[0];
   return `
-  <div class="page-head"><div><h1>បង្កើតកាត</h1><p>ជ្រើសសិស្ស មើលជាមុន រួចបោះពុម្ពលើក្រដាស A4 (៤កាត/ទំព័រ)</p></div>
+  <div class="page-head"><div><h1>បង្កើតកាត</h1><p>ជ្រើសសិស្ស មើលជាមុន រួចបោះពុម្ពលើក្រដាស A4 (${kh(sizeCols().cols*sizeCols().rows)} កាត/ទំព័រ)</p></div>
     <div class="row noprint" id="cact"></div></div>
   <div class="cw">
     <aside class="grid" style="gap:16px"><div class="panel seg">
@@ -567,7 +586,14 @@ function designPanel(){const c=S.cfg;
   const up=(k,l)=>`<label class="btn sm" for="up_${k}" style="cursor:pointer">${ic("up")}${l}</label><input type="file" id="up_${k}" data-up="${k}" accept="image/*" class="sr">`;
   const pre=["#FFFFFF","#F1F5FD","#FFF8E1","#E8F5E9","#FCE4EC","#E3F2FD","#F3E5F5","#FFF3E0"];
   const fit=[["cover","ពេញកាត (កាត់គែមលើស)"],["contain","ឱ្យសមទាំងអស់"],["fill","ទាញពេញកាត"]];
+  const sz=sizeCols(),PRE=[["custom","កំណត់ដោយខ្លួនឯង"],["90x127","ទំហំដើម 90×127"],["54x85.6","កាតធនាគារ (CR80) បញ្ឈរ 54×85.6"],["85.6x54","កាតធនាគារ (CR80) ផ្តេក 85.6×54"],["74x105","A7 74×105"],["105x148","A6 105×148"]],cur=c.cw+"x"+c.ch;
   return `<section class="panel sect" id="dsg"><h2>ការរចនាកាត</h2>
+  <div class="field"><label for="szp">ទំហំកាត (មិល្លីម៉ែត្រ)</label>
+    <select class="in" id="szp" data-sz="preset">${PRE.map(p=>`<option value="${p[0]}" ${(PRE.some(x=>x[0]===cur)?cur:"custom")===p[0]?"selected":""}>${p[1]}</option>`).join("")}</select>
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px"><div class="field"><label for="szw">ទទឹង</label><input class="in" type="number" id="szw" data-sz="w" min="30" max="190" step="0.5" value="${c.cw}"></div>
+      <div class="field"><label for="szh">កម្ពស់</label><input class="in" type="number" id="szh" data-sz="h" min="30" max="270" step="0.5" value="${c.ch}"></div></div>
+    <label class="hint" style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-sz="scale" ${S.szScale===false?"":"checked"}> ប្តូរទីតាំង និងទំហំវត្ថុក្នុងកាតតាមសមាមាត្រ</label>
+    <span class="ed-note">ក្រដាស A4 ដាក់បាន ${kh(sz.cols)}×${kh(sz.rows)} = ${kh(sz.cols*sz.rows)} កាត/ទំព័រ។ វាយលេខរួចចុច Enter ឬចុចកន្លែងផ្សេង។</span></div>
   <div class="field"><label>ពណ៌ផ្ទៃកាត (Colour)</label>
     <div class="row"><input type="color" id="bgc" data-in="bgc" value="${esc(c.bgc)}" aria-label="ជ្រើសពណ៌ផ្ទៃ" class="swatch"><input class="in" id="bgx" data-in="bgx" value="${esc(c.bgc)}" maxlength="7" style="width:112px" aria-label="កូដពណ៌"></div>
     <div class="row">${pre.map(p=>`<button type="button" class="dot" data-act="bgpre" data-c="${p}" style="background:${p}" aria-label="ពណ៌ ${p}"></button>`).join("")}</div></div>
@@ -601,8 +627,11 @@ function drawEditPanel(){
 }
 function drawCards(){
   const a=selected(),st=$("#stage"),ac=$("#cact");if(!st)return;
-  if(S.edit){const smp=a[0]||S.students[0]||SAMPLE;st.innerHTML=`<div class="sheet big" style="grid-template-columns:90mm">${cardHTML(smp,true)}</div>`}
+  if(S.edit){const smp=a[0]||S.students[0]||SAMPLE;st.innerHTML=`<div class="sheet big" style="grid-template-columns:var(--cw)">${cardHTML(smp,true)}</div>`}
   else st.innerHTML=a.length?`<div class="sheet">${a.map(c=>cardHTML(c,false)).join("")}</div>`:`<div class="empty">មិនទាន់ជ្រើសសិស្សទេ</div>`;
+  const sh=st.querySelector(".sheet");
+  if(sh){const n=S.edit?1:Math.max(1,getComputedStyle(sh).gridTemplateColumns.split(" ").length),need=(n*S.cfg.cw+(n-1)*4)*3.7795,avail=st.clientWidth-(innerWidth<=760?24:40),z0=S.edit?1.35:(innerWidth<=760?.85:.82);
+    sh.style.zoom=Math.max(.3,Math.min(z0,avail/need)).toFixed(3)}
   ac.innerHTML=`<span class="pill">${kh(a.length)} កាត</span>`+(LOCAL?`<button class="btn primary" data-act="print" ${a.length?"":"disabled"}>${ic("print")}បោះពុម្ព / PDF</button>`:
     `<span class="hint" style="max-width:260px">ដើម្បីបោះពុម្ព ឬរក្សាជា PDF សូមបើកឯកសារ HTML ក្នុងកុំព្យូទ័រ (ទាញពីការសន្ទនា)។</span>`);
 }
@@ -676,7 +705,7 @@ function syncNums(){const L=S.cfg.lay[S.selEl];["x","y","w","h","fs"].forEach(k=
 document.addEventListener("pointerdown",e=>{
   if(!S.edit)return;const el=e.target.closest(".el");if(!el||!el.closest(".edm"))return;
   const k=el.dataset.el,card=el.closest(".card"),w=card.getBoundingClientRect().width;
-  drag={k,mode:e.target.classList.contains("rz")?"rz":"mv",ppm:w/90,x0:e.clientX,y0:e.clientY,o:Object.assign({},S.cfg.lay[k]),el};
+  drag={k,mode:e.target.classList.contains("rz")?"rz":"mv",ppm:w/S.cfg.cw,x0:e.clientX,y0:e.clientY,o:Object.assign({},S.cfg.lay[k]),el};
   const changed=S.selEl!==k;S.selEl=k;
   if(changed){document.querySelectorAll(".edm .el").forEach(n=>n.classList.toggle("on",n===el));drawEditPanel()}
   try{el.setPointerCapture(e.pointerId)}catch(x){}
@@ -866,7 +895,7 @@ document.addEventListener("click",e=>{
   else if(a==="layedit"){S.edit=!S.edit;go("cards",true)}
   else if(a==="bgpre"){S.cfg.bgc=b.dataset.c;saveCfg();go(S.view,true)}
   else if(a==="selel"){S.selEl=b.dataset.k;drawEditPanel();drawCards()}
-  else if(a==="rlay"){S.cfg.lay[S.selEl]=Object.assign({},DEFLAY[S.selEl]);saveCfg();drawEditPanel();drawCards()}
+  else if(a==="rlay"){S.cfg.lay[S.selEl]=defFor(S.selEl);saveCfg();drawEditPanel();drawCards()}
   else if(a==="nobg"){S.cfg.bg="";saveCfg();go(S.view,true)}
   else if(a==="noframe"){S.cfg.frame="";saveCfg();go(S.view,true)}
   else if(a==="fcreset"){S.cfg.lay[S.selEl].fc="";saveCfg();drawEditPanel();drawCards()}
@@ -906,6 +935,12 @@ document.addEventListener("input",e=>{
 });
 document.addEventListener("change",async e=>{
   const t=e.target;
+  if(t.dataset.sz){
+    if(t.dataset.sz==="scale"){S.szScale=t.checked;return}
+    let w=S.cfg.cw,h=S.cfg.ch;
+    if(t.dataset.sz==="preset"){if(t.value==="custom")return;[w,h]=t.value.split("x").map(Number)}
+    else if(t.dataset.sz==="w")w=parseFloat(t.value);else h=parseFloat(t.value);
+    setCardSize(w,h,S.szScale!==false);return}
   if(t.id==="pf"&&t.files[0]){formPhoto=await readPhoto(t.files[0]);$("#pv").innerHTML=formPhoto?`<img src="${formPhoto}" alt="">`:"មិនអាចបើករូបបាន"}
   if(t.dataset.up&&t.files[0]){
     const k=t.dataset.up,f=t.files[0];
