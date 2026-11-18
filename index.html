@@ -135,7 +135,7 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .banner{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--teal-soft);border-radius:16px;padding:12px 16px;margin-bottom:18px}
 
 /* table */
-.tw{overflow-x:auto;border:1px solid var(--line);border-radius:16px}
+.pk{display:inline-flex;align-items:center;gap:8px;cursor:pointer}.pk input{width:18px;height:18px;accent-color:var(--p,#6C3EF4)}.bulk{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}.tw{overflow-x:auto;border:1px solid var(--line);border-radius:16px}
 table{border-collapse:collapse;width:100%;min-width:760px;background:var(--surface)}
 th{font-family:var(--f-display);font-weight:400;font-size:12.5px;background:var(--surface2);text-align:left;padding:12px 14px;white-space:nowrap}
 td{padding:10px 14px;border-top:1px solid var(--line);vertical-align:middle}
@@ -262,7 +262,7 @@ td.act{white-space:nowrap;text-align:right}
   tbody tr{display:grid;grid-template-columns:auto auto auto 1fr auto;grid-template-areas:"ph name name name act" "ph no cls sex act" "ph dob dob dob act";gap:2px 10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 12px}
   tbody tr:hover{background:var(--surface)}
   td{border:0;padding:0}
-  td.c-ph{grid-area:ph}td.c-name{grid-area:name;font-weight:700}td.c-no{grid-area:no;color:var(--muted)}
+  td.c-ph{grid-area:ph}.pk{gap:6px}td.c-name{grid-area:name;font-weight:700}td.c-no{grid-area:no;color:var(--muted)}
   td.c-cls{grid-area:cls}td.c-sex{grid-area:sex}td.c-dob{grid-area:dob;color:var(--muted);font-size:13px}td.c-par{display:none}td.act{grid-area:act}
   .sheet{grid-template-columns:var(--cw,90mm);zoom:.85}.sheet.big{zoom:.8}.stage{padding:12px}
   .modal{padding:18px;border-radius:20px}
@@ -326,7 +326,7 @@ const S={
   students:LS.get("cms.students",null)||DEMO,
   cfg:Object.assign({},DEF,LS.get("cms.cfg",{})),
   authed:false,view:"dashboard",q:"",fc:"",fs:"",page:1,
-  scope:"all",scls:"",sel:new Set(),built:true,edit:false,selEl:"photo"
+  scope:"all",scls:"",sel:new Set(),ps:new Set(),built:true,edit:false,selEl:"photo"
 };
 /* ---------- card size (mm). Layout numbers are millimetres on the card, so they can be scaled when the size changes ---------- */
 const IMGKEYS=["photo","logo","stamp","frame"];
@@ -478,9 +478,14 @@ function drawList(){
   const el=$("#list");if(!el)return;
   const a=filtered(),pages=Math.max(1,Math.ceil(a.length/PER));if(S.page>pages)S.page=pages;
   const rows=a.slice((S.page-1)*PER,S.page*PER);
+  const phn=[...S.ps].filter(id=>{const x=S.students.find(z=>z.id===id);return x&&x.photo}).length,
+    allPg=rows.length&&rows.every(r=>S.ps.has(r.id));
   el.innerHTML=a.length?`
-  <div class="tw"><table><thead><tr><th>រូប</th><th>អត្តលេខ</th><th>គោត្តនាម-នាម</th><th>ភេទ</th><th>ថ្នាក់ទី</th><th>ថ្ងៃខែឆ្នាំកំណើត</th><th>ឪពុក / ម្តាយ</th><th></th></tr></thead><tbody>
-  ${rows.map(s=>`<tr><td class="c-ph">${thumb(s)}</td><td class="c-no">${esc(s.no)}</td><td class="c-name">${esc(s.name)}</td>
+  <div class="bulk"><button class="btn sm" data-act="psall">ជ្រើសសិស្សមានរូបថតទាំងអស់ (តាមតម្រង)</button>
+    <button class="btn sm ghost" data-act="psnone" ${S.ps.size?"":"disabled"}>ដកការជ្រើស</button>
+    <button class="btn sm danger" data-act="psdel" ${phn?"":"disabled"}>${ic("trash")}លុបរូបថតដែលបានជ្រើស (${kh(phn)})</button></div>
+  <div class="tw"><table><thead><tr><th><label class="pk"><input type="checkbox" data-in="pspage" ${allPg?"checked":""} aria-label="ជ្រើសទាំងទំព័រ"> រូប</label></th><th>អត្តលេខ</th><th>គោត្តនាម-នាម</th><th>ភេទ</th><th>ថ្នាក់ទី</th><th>ថ្ងៃខែឆ្នាំកំណើត</th><th>ឪពុក / ម្តាយ</th><th></th></tr></thead><tbody>
+  ${rows.map(s=>`<tr><td class="c-ph"><label class="pk"><input type="checkbox" data-in="ps" value="${s.id}" ${S.ps.has(s.id)?"checked":""} aria-label="ជ្រើស ${esc(s.name)}">${thumb(s)}</label></td><td class="c-no">${esc(s.no)}</td><td class="c-name">${esc(s.name)}</td>
     <td class="c-sex"><span class="pill ${s.sex==="ស្រី"?"f":"m"}">${esc(s.sex)}</span></td><td class="c-cls">${esc(s.cls)}</td><td class="c-dob">${esc(s.dob)}</td>
     <td class="c-par">${esc(s.father)}<small style="color:var(--muted);display:block">${esc(s.mother)}</small></td>
     <td class="act"><button class="btn sm" data-act="edit" data-id="${s.id}" aria-label="កែប្រែ ${esc(s.name)}">${ic("edit")}កែ</button></td></tr>`).join("")}
@@ -887,6 +892,11 @@ document.addEventListener("click",e=>{
   else if(a==="del"){
     if(!b.classList.contains("sure")){b.classList.add("sure");b.lastChild.textContent="ចុចម្តងទៀតដើម្បីបញ្ជាក់";return}
     S.students=S.students.filter(s=>s.id!==id);saveStudents();closeForm();toast("លុបបានជោគជ័យ");go(S.view)}
+  else if(a==="psall"){filtered().forEach(r=>{if(r.photo)S.ps.add(r.id)});drawList()}
+  else if(a==="psnone"){S.ps.clear();drawList()}
+  else if(a==="psdel"){
+    if(!b.classList.contains("sure")){b.classList.add("sure");b.lastChild.textContent="ចុចម្តងទៀតដើម្បីបញ្ជាក់ការលុបរូបថត";return}
+    let n=0;S.students.forEach(x=>{if(S.ps.has(x.id)&&x.photo){x.photo="";n++}});S.ps.clear();saveStudents();toast("បានលុបរូបថត "+kh(n)+" រូប");drawList()}
   else if(a==="pg"){S.page+=+b.dataset.d;drawList()}
   else if(a==="clrdemo"){S.students=S.students.filter(s=>!s.demo);saveStudents();go(S.view)}
   else if(a==="selall"){S.students.forEach(s=>S.sel.add(s.id));go("cards")}
@@ -931,6 +941,8 @@ document.addEventListener("input",e=>{
   else if(k==="bgfit"){S.cfg.bgfit=t.value;saveCfg();drawCards()}
   else if(k==="selel"){S.selEl=t.value;drawEditPanel();drawCards()}
   else if(k==="bgop"){S.cfg.bgop=+t.value;const v=$("#bgv");if(v)v.textContent=t.value;saveCfg();drawCards()}
+  else if(k==="ps"){t.checked?S.ps.add(t.value):S.ps.delete(t.value);drawList()}
+  else if(k==="pspage"){const a=filtered().slice((S.page-1)*PER,S.page*PER);a.forEach(r=>t.checked?S.ps.add(r.id):S.ps.delete(r.id));drawList()}
   else if(k==="pick"){t.checked?S.sel.add(t.value):S.sel.delete(t.value);drawCards()}
 });
 document.addEventListener("change",async e=>{
